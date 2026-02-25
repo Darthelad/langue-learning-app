@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Mobile Responsiveness Overrides */
+@media (max-width: 600px) {
+    .header-container {
+        padding: 20px 15px 15px !important;
+    }
+
+    .header-title {
+        font-size: 28px !important;
+    }
+
+    .tabs-container {
+        -webkit-overflow-scrolling: touch;
+        /* Hide the scrollbar for a cleaner look on mobile */
+        scrollbar-width: none;
+    }
+
+    .tabs-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        padding: 10px 12px !important;
+        font-size: 11px !important;
+        min-width: 70px !important;
+    }
+
+    .tab-icon {
+        font-size: 16px !important;
+    }
+
+    .content-wrapper {
+        padding: 0 15px 20px !important;
+    }
+
+    /* Utility/General */
+    .mobile-stack {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .mobile-full-width {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Component Specifics */
+    .flashcard-box {
+        padding: 20px !important;
+        min-height: 150px !important;
+    }
+
+    .flashcard-word {
+        font-size: 26px !important;
+    }
+
+    .mcq-button {
+        font-size: 14px !important;
+        padding: 12px 14px !important;
+    }
+
+    .conj-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .api-key-box {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .api-key-input-wrapper {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .api-key-input {
+        width: 100% !important;
+    }
+
+    .chat-input-row {
+        flex-direction: column !important;
+    }
+
+    .chat-input-row input {
+        margin-bottom: 8px !important;
+    }
+
+    .chat-input-row button {
+        width: 100% !important;
+    }
+}
