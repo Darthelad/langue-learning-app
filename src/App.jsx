@@ -75,7 +75,7 @@ function Badge({ children, color }) {
 }
 
 // ── VOCABULARY TAB ────────────────────────────────────────────────────────────
-function VocabularyTab({ data }) {
+function VocabularyTab({ data, gainXP }) {
   const [mode, setMode] = useState("flashcard"); // flashcard | multiple | conjugation
   const [cardIdx, setCardIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -87,9 +87,12 @@ function VocabularyTab({ data }) {
   const [conjChecked, setConjChecked] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
 
-  const [typeFilter, setTypeFilter] = useState("all");
-  const wordTypes = ["all", "noun", "verb", "adjective", "adverb", "preposition", "conjunction", "pronoun", "number", "greeting"];
-  const filteredCards = typeFilter === "all" ? cards : cards.filter(c => c.type === typeFilter);
+  const defaultTopics = [...new Set(data.VOCABULARY.map(v => v.topic || "Misc & Core Vocab"))];
+  const baseProgression = data.PROGRESSION || [];
+  const wordTopics = [...new Set([...baseProgression.filter(t => defaultTopics.includes(t)), ...defaultTopics])];
+  const [typeFilter, setTypeFilter] = useState(wordTopics[0] || "all");
+
+  const filteredCards = typeFilter === "all" ? cards : cards.filter(c => c.topic === typeFilter);
   const card = filteredCards[cardIdx % (filteredCards.length || 1)] || cards[0];
 
   function generateMcq(fromCards) {
@@ -102,10 +105,13 @@ function VocabularyTab({ data }) {
 
   useEffect(() => {
     // If language changes, reset cards for the new vocabulary pool
+    const dTopics = [...new Set(data.VOCABULARY.map(v => v.topic || "Misc & Core Vocab"))];
+    const bProgression = data.PROGRESSION || [];
+    const newTopics = [...new Set([...bProgression.filter(t => dTopics.includes(t)), ...dTopics])];
     setCards(shuffle(data.VOCABULARY));
     setCardIdx(0);
     setFlipped(false);
-    setTypeFilter("all");
+    setTypeFilter(newTopics[0] || "all");
     setMode("flashcard");
     setScore({ correct: 0, total: 0 });
   }, [data.VOCABULARY]);
@@ -136,12 +142,12 @@ function VocabularyTab({ data }) {
   return (
     <div style={{ padding: "20px 0" }}>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
-        {wordTypes.map(t => {
-          const count = t === "all" ? data.VOCABULARY.length : data.VOCABULARY.filter(v => v.type === t).length;
+        {wordTopics.map(t => {
+          const count = t === "all" ? data.VOCABULARY.length : data.VOCABULARY.filter(v => v.topic === t).length;
           if (count === 0 && t !== "all") return null;
           return (
             <button key={t} onClick={() => { setTypeFilter(t); setCardIdx(0); setFlipped(false); }}
-              style={{ padding: "4px 12px", borderRadius: 14, border: typeFilter === t ? "none" : "1px solid #ddd", background: typeFilter === t ? "#8b6914" : "#f5f0e8", color: typeFilter === t ? "#fff" : "#555", cursor: "pointer", fontFamily: "inherit", fontSize: 11, fontWeight: 600, textTransform: "capitalize" }}>
+              style={{ padding: "4px 12px", borderRadius: 14, border: typeFilter === t ? "none" : "1px solid #ddd", background: typeFilter === t ? "#8b6914" : "#f5f0e8", color: typeFilter === t ? "#fff" : "#555", cursor: "pointer", fontFamily: "inherit", fontSize: 11, fontWeight: 600 }}>
               {t === "all" ? `All (${count})` : `${t} (${count})`}
             </button>
           )
@@ -194,10 +200,11 @@ function VocabularyTab({ data }) {
               boxShadow: "0 4px 20px rgba(139,105,20,0.15)",
             }}
           >
-            <Badge color={card.type}>{card.type}</Badge>
+            {card.topic && <Badge color={card.topic}>{card.topic}</Badge>}
             <div className="flashcard-word" style={{ fontSize: 36, fontWeight: 700, marginTop: 16, textAlign: "center", transition: "all 0.2s" }}>
-              {flipped ? card.en : card.it}
+              {flipped ? card.en : (card.it || card.es || card.he || card.kr)}
             </div>
+            {!flipped && card.rom && <div style={{ fontSize: 18, color: "#666", marginTop: 8 }}>{card.rom}</div>}
             {!flipped && <div style={{ marginTop: 12, fontSize: 13, color: "#999" }}>Click to reveal</div>}
           </div>
           <div style={{ display: "flex", gap: 12, marginTop: 16, justifyContent: "center" }}>
@@ -206,7 +213,7 @@ function VocabularyTab({ data }) {
               style={btnStyle("#fff", "#8b6914")}
             >← Prev</button>
             <button
-              onClick={() => { setScore((s) => ({ correct: s.correct + 1, total: s.total + 1 })); setCardIdx((i) => (i + 1) % filteredCards.length); setFlipped(false); }}
+              onClick={() => { setScore((s) => ({ correct: s.correct + 1, total: s.total + 1 })); setCardIdx((i) => (i + 1) % filteredCards.length); setFlipped(false); gainXP(2, `vocab-flash-${card.en}`); }}
               style={btnStyle("#4caf50", "#fff")}
             >✓ Knew it</button>
             <button
@@ -227,12 +234,13 @@ function VocabularyTab({ data }) {
       {mode === "multiple" && mcq && (
         <div>
           <div style={{ fontSize: 18, color: "#555", marginBottom: 8 }}>What does this mean?</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#222", marginBottom: 8 }}>{mcq.correct.it}</div>
-          <Badge color={mcq.correct.type}>{mcq.correct.type}</Badge>
+          <div style={{ fontSize: 32, fontWeight: 700, color: "#222", marginBottom: 8 }}>{mcq.correct.it || mcq.correct.es || mcq.correct.he || mcq.correct.kr}</div>
+          {mcq.correct.rom && <div style={{ fontSize: 18, color: "#666", marginBottom: 8 }}>{mcq.correct.rom}</div>}
+          {mcq.correct.topic && <Badge color={mcq.correct.topic}>{mcq.correct.topic}</Badge>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
             {mcq.opts.map((opt, i) => {
-              const isCorrect = opt.it === mcq.correct.it;
-              const isSelected = mcqAnswer?.it === opt.it;
+              const isCorrect = opt.en === mcq.correct.en;
+              const isSelected = mcqAnswer?.en === opt.en;
               let bg = "#fff", border = "1.5px solid #ddd";
               if (mcqAnswer) {
                 if (isCorrect) { bg = "#e8f5e9"; border = "2px solid #4caf50"; }
@@ -244,8 +252,9 @@ function VocabularyTab({ data }) {
                   onClick={() => {
                     if (mcqAnswer) return;
                     setMcqAnswer(opt);
-                    const correct = opt.it === mcq.correct.it;
+                    const correct = opt.en === mcq.correct.en;
                     setScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+                    if (correct) gainXP(5, `vocab-mcq-${mcq.correct.en}`);
                   }}
                   style={{ padding: "14px 20px", borderRadius: 10, border, background: bg, textAlign: "left", cursor: mcqAnswer ? "default" : "pointer", fontFamily: "inherit", fontSize: 16, transition: "all 0.2s" }}
                 >
@@ -304,7 +313,7 @@ function VocabularyTab({ data }) {
 }
 
 // ── GRAMMAR ANALYSIS TAB ──────────────────────────────────────────────────────
-function GrammarTab({ data }) {
+function GrammarTab({ data, gainXP }) {
   const [qIdx, setQIdx] = useState(0);
   const [selected, setSelected] = useState(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
@@ -320,7 +329,9 @@ function GrammarTab({ data }) {
   const handleSelect = (i) => {
     if (selected !== null) return;
     setSelected(i);
-    setScore((s) => ({ correct: s.correct + (i === q.answer ? 1 : 0), total: s.total + 1 }));
+    const correct = i === q.answer;
+    setScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+    if (correct) gainXP(10, `grammar-${q.sentence}`);
   };
 
   if (!q) return <div style={{ padding: "20px 0" }}>No grammar questions available for this language yet.</div>;
@@ -377,7 +388,7 @@ function GrammarTab({ data }) {
 }
 
 // ── SENTENCE BUILDER TAB ──────────────────────────────────────────────────────
-function SentenceBuilderTab({ data, languageStr }) {
+function SentenceBuilderTab({ data, languageStr, gainXP }) {
   const [promptIdx, setPromptIdx] = useState(0);
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
@@ -413,6 +424,7 @@ Please provide structured, encouraging feedback in English. Your response should
         `You are a friendly, encouraging, and highly detailed ${languageStr} language teacher. Format your response using clean Markdown headers and bullet points for readability.`
       );
       setFeedback(text);
+      gainXP(15, `sentence-${prompt.prompt}`);
     } catch {
       setFeedback("Error getting feedback. Please try again.");
     }
@@ -454,7 +466,7 @@ Please provide structured, encouraging feedback in English. Your response should
 }
 
 // ── CONVERSATION TAB ──────────────────────────────────────────────────────────
-function ConversationTab({ data, languageStr }) {
+function ConversationTab({ data, languageStr, gainXP }) {
   const [topicIdx] = useState(() => Math.floor(Math.random() * data.CONVERSATION_TOPICS.length));
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -499,6 +511,7 @@ function ConversationTab({ data, languageStr }) {
         `You are a friendly ${languageStr} conversation partner discussing: "${topic}". Always respond in ${languageStr}. Keep the conversation going naturally. If the user makes obvious errors, continue naturally without pointing them out — errors will be reviewed later.`
       );
       setMessages([...newMessages, { role: "assistant", content: reply }]);
+      gainXP(10, `chat-${topicIdx}-${newMessages.length}`);
     } catch (e) {
       alert(e.message);
       setMessages(messages);
@@ -634,7 +647,7 @@ function ConversationTab({ data, languageStr }) {
 }
 
 // ── IDIOMS TAB ────────────────────────────────────────────────────────────────
-function IdiomsTab({ data }) {
+function IdiomsTab({ data, gainXP }) {
   const [expanded, setExpanded] = useState(null);
   const [quizMode, setQuizMode] = useState(false);
   const [quizIdx, setQuizIdx] = useState(0);
@@ -755,7 +768,12 @@ function IdiomsTab({ data }) {
                 else if (isSelected) { bg = "#ffebee"; border = "2px solid #e53935"; }
               }
               return (
-                <button key={i} onClick={() => { if (!quizAnswer) setQuizAnswer(opt); }} style={{ padding: "13px 18px", borderRadius: 10, border, background: bg, textAlign: "left", cursor: quizAnswer ? "default" : "pointer", fontFamily: "inherit", fontSize: 15, transition: "all 0.2s" }}>
+                <button key={i} onClick={() => {
+                  if (!quizAnswer) {
+                    setQuizAnswer(opt);
+                    if (isCorrect) gainXP(5, `idiom-${qi.phrase}`);
+                  }
+                }} style={{ padding: "13px 18px", borderRadius: 10, border, background: bg, textAlign: "left", cursor: quizAnswer ? "default" : "pointer", fontFamily: "inherit", fontSize: 15, transition: "all 0.2s" }}>
                   {opt}
                 </button>
               );
@@ -796,12 +814,13 @@ function btnStyle(bg, color) {
 }
 
 // ── ALPHABET TAB ──────────────────────────────────────────────────────────────
-function AlphabetTab({ alphabetData, langCode }) {
+function AlphabetTab({ alphabetData, langCode, gainXP }) {
   const playAudio = (text) => {
     if (!window.speechSynthesis) return;
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = langCode; // e.g., 'ko-KR', 'he-IL'
     window.speechSynthesis.speak(utterance);
+    gainXP(1, `alpha-${langCode}-${text}`);
   };
 
   return (
@@ -834,6 +853,119 @@ function AlphabetTab({ alphabetData, langCode }) {
   );
 }
 
+// ── CULTURE TAB ───────────────────────────────────────────────────────────────
+function CultureTab({ data, gainXP }) {
+  const [filterCat, setFilterCat] = useState("All");
+  const cultureItems = data.CULTURE || [];
+  const categories = ["All", "Music", "TV Show", "Movie"];
+
+  const filtered = filterCat === "All" ? cultureItems : cultureItems.filter(c => c.category === filterCat);
+
+  return (
+    <div style={{ marginTop: 20 }}>
+      <h2 style={{ fontSize: 24, fontWeight: 700, color: "#333", borderBottom: "2px solid #eee", paddingBottom: 10, marginBottom: 20 }}>
+        Cultural Immersion
+      </h2>
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setFilterCat(cat)}
+            style={{
+              padding: "8px 16px", borderRadius: 20, border: filterCat === cat ? "none" : "1.5px solid #d4a017",
+              background: filterCat === cat ? "#8b6914" : "transparent",
+              color: filterCat === cat ? "#fff" : "#8b6914",
+              fontWeight: 600, fontSize: 14, cursor: "pointer", transition: "all 0.2s"
+            }}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+        {filtered.map((item) => (
+          <div key={item.id} style={{
+            background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            transition: "transform 0.2s, box-shadow 0.2s", display: "flex", flexDirection: "column"
+          }}>
+            <div style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${item.id}`}
+                title={item.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                onLoad={() => gainXP(5, `culture-${item.id}`)}
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+              ></iframe>
+            </div>
+            <div style={{ padding: 16, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#8b6914", textTransform: "uppercase", marginBottom: 6 }}>{item.category}</span>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: "#333", margin: "0 0 8px 0", lineHeight: 1.4 }}>{item.title}</h3>
+              <p style={{ margin: 0, fontSize: 13, color: "#777", marginTop: "auto" }}>{item.channel}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      {filtered.length === 0 && (
+        <div style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          No content available for this category yet.
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── VIDEO TAB ─────────────────────────────────────────────────────────────────
+function VideoTab({ data, gainXP }) {
+  const videos = data.VIDEOS || [];
+
+  return (
+    <div style={{ marginTop: 20 }}>
+      <h2 style={{ fontSize: 24, fontWeight: 700, color: "#333", borderBottom: "2px solid #eee", paddingBottom: 10, marginBottom: 20 }}>
+        Curated Learning Videos
+      </h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+        {videos.map((video) => (
+          <div key={video.id} style={{
+            background: "#fff",
+            borderRadius: 12,
+            overflow: "hidden",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+            transition: "transform 0.2s, box-shadow 0.2s",
+            cursor: "pointer",
+            display: "flex",
+            flexDirection: "column"
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.12)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"; }}
+          >
+            <div style={{ position: "relative", width: "100%", paddingTop: "56.25%" }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${video.id}`}
+                title={video.title}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+              ></iframe>
+            </div>
+            <div style={{ padding: 16, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: "#333", margin: "0 0 8px 0", lineHeight: 1.4 }}>{video.title}</h3>
+              <p style={{ margin: 0, fontSize: 13, color: "#777", marginTop: "auto" }}>{video.channel}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      {videos.length === 0 && (
+        <div style={{ textAlign: "center", padding: 40, color: "#888" }}>
+          No videos available for this language yet.
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── CONFIGURATION ─────────────────────────────────────────────────────────────
 const LANGUAGES = {
   italian: {
@@ -850,7 +982,9 @@ const LANGUAGES = {
       { id: "grammar", label: "Grammar", icon: "✏️" },
       { id: "builder", label: "Sentence Builder", icon: "🔨" },
       { id: "chat", label: "Conversation", icon: "💬" },
-      { id: "idioms", label: "Phrases & Idioms", icon: "🇮🇹" }
+      { id: "idioms", label: "Phrases & Idioms", icon: "🇮🇹" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
     ]
   },
   korean: {
@@ -868,7 +1002,9 @@ const LANGUAGES = {
       { id: "grammar", label: "Grammar", icon: "✏️" },
       { id: "builder", label: "Sentence Builder", icon: "🔨" },
       { id: "chat", label: "Conversation", icon: "💬" },
-      { id: "idioms", label: "Phrases & Idioms", icon: "🎎" }
+      { id: "idioms", label: "Phrases & Idioms", icon: "🎎" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
     ]
   },
   hebrew: {
@@ -886,7 +1022,9 @@ const LANGUAGES = {
       { id: "grammar", label: "Grammar", icon: "✏️" },
       { id: "builder", label: "Sentence Builder", icon: "🔨" },
       { id: "chat", label: "Conversation", icon: "💬" },
-      { id: "idioms", label: "Phrases & Idioms", icon: "🐪" }
+      { id: "idioms", label: "Phrases & Idioms", icon: "🐪" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
     ]
   },
   spanish: {
@@ -903,7 +1041,9 @@ const LANGUAGES = {
       { id: "grammar", label: "Grammar", icon: "✏️" },
       { id: "builder", label: "Sentence Builder", icon: "🔨" },
       { id: "chat", label: "Conversation", icon: "💬" },
-      { id: "idioms", label: "Phrases & Idioms", icon: "🇪🇸" }
+      { id: "idioms", label: "Phrases & Idioms", icon: "🇪🇸" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
     ]
   }
 };
@@ -914,6 +1054,43 @@ export default function App() {
   const [currentView, setCurrentView] = useState("home"); // 'home' or 'learning'
   const [langIdx, setLangIdx] = useState(0);
   const [activeTab, setActiveTab] = useState("vocab");
+
+  const [userXP, setUserXP] = useState(0);
+  const [userLevel, setUserLevel] = useState(1);
+  const [completedItems, setCompletedItems] = useState({});
+  const [showXPToast, setShowXPToast] = useState(null);
+
+  useEffect(() => {
+    const xp = parseInt(localStorage.getItem('langue_xp') || '0');
+    const level = parseInt(localStorage.getItem('langue_level') || '1');
+    const completed = JSON.parse(localStorage.getItem('langue_completed') || '{}');
+    setUserXP(xp);
+    setUserLevel(level);
+    setCompletedItems(completed);
+  }, []);
+
+  const gainXP = (amount, itemId) => {
+    if (itemId && completedItems[itemId]) return; // Already completed
+
+    const newCompleted = itemId ? { ...completedItems, [itemId]: true } : completedItems;
+    const newXP = userXP + amount;
+
+    let newLevel = 1;
+    while (50 * newLevel * (newLevel + 1) <= newXP) {
+      newLevel++;
+    }
+
+    setUserXP(newXP);
+    setUserLevel(newLevel);
+    setCompletedItems(newCompleted);
+
+    localStorage.setItem('langue_xp', newXP);
+    localStorage.setItem('langue_level', newLevel);
+    localStorage.setItem('langue_completed', JSON.stringify(newCompleted));
+
+    setShowXPToast({ amount, text: newLevel > userLevel ? `Level Up! You are now Level ${newLevel}` : '+XP' });
+    setTimeout(() => setShowXPToast(null), 3000);
+  };
 
   const currentLangCode = LANG_KEYS[langIdx];
   const config = LANGUAGES[currentLangCode];
@@ -933,8 +1110,9 @@ export default function App() {
           background: "linear-gradient(135deg, #1f1c2c 0%, #928DAB 100%)",
           padding: 20
         }}>
-          <div style={{ textAlign: "center", marginBottom: 60 }}>
-            <h1 style={{ fontSize: "4rem", color: "#fff", margin: 0, textShadow: "0 4px 12px rgba(0,0,0,0.3)", letterSpacing: "-1px" }}>Langue Learning</h1>
+          <div style={{ textAlign: "center", marginBottom: 60, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <img src="/logo.png" alt="Pengu Glot" style={{ width: 140, height: 140, marginBottom: 20, borderRadius: 24, boxShadow: "0 8px 30px rgba(0,0,0,0.3)" }} />
+            <h1 style={{ fontSize: "4rem", color: "#fff", margin: 0, textShadow: "0 4px 12px rgba(0,0,0,0.3)", letterSpacing: "-1px" }}>Pengu Glot</h1>
             <p style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.8)", marginTop: 10 }}>Select a language to begin your journey</p>
           </div>
 
@@ -993,42 +1171,62 @@ export default function App() {
                 <span>🏠</span> Home
               </button>
 
-              <div style={{ position: "absolute", top: -10, right: 0 }}>
-                <select
-                  value={langIdx}
-                  onChange={(e) => {
-                    const newIdx = Number(e.target.value);
-                    const newConfig = LANGUAGES[LANG_KEYS[newIdx]];
-                    const isTabValid = newConfig.tabs.some(t => t.id === activeTab);
-                    if (!isTabValid) {
-                      setActiveTab(newConfig.tabs[0].id);
-                    }
-                    setLangIdx(newIdx);
-                  }}
-                  style={{
-                    padding: "6px 28px 6px 14px",
-                    borderRadius: "20px",
-                    background: "rgba(255,255,255,0.2)",
-                    border: "1px solid rgba(255,255,255,0.4)",
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    transition: "background 0.2s",
-                    appearance: "none",
-                    WebkitAppearance: "none",
-                    outline: "none"
-                  }}
-                >
-                  {LANG_KEYS.map((key, idx) => (
-                    <option key={key} value={idx} style={{ color: "#333", background: "#fff" }}>
-                      Mode: {LANGUAGES[key].flag} {LANGUAGES[key].name}
-                    </option>
-                  ))}
-                </select>
-                <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", fontSize: 10, color: "#fff" }}>▼</div>
+              <div style={{ position: "absolute", top: -10, right: 0, display: "flex", gap: 10, alignItems: "center" }}>
+                {/* XP Progress Bar */}
+                <div style={{
+                  background: "rgba(255, 255, 255, 0.15)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 20,
+                  padding: "4px 10px", display: "flex", alignItems: "center", gap: 8, color: "#fff", fontSize: 13, fontWeight: 600,
+                  whiteSpace: "nowrap"
+                }}>
+                  <span style={{ fontSize: 16 }} title={`${userXP} total XP`}>⭐</span> Lvl {userLevel}
+                  <div style={{ width: 50, height: 6, background: "rgba(0,0,0,0.3)", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{
+                      width: `${Math.min(100, (userXP - (50 * (userLevel - 1) * userLevel)) / (100 * userLevel) * 100)}%`,
+                      background: "#4ade80", height: "100%", transition: "width 0.3s ease"
+                    }} />
+                  </div>
+                </div>
+
+                <div style={{ position: "relative" }}>
+                  <select
+                    value={langIdx}
+                    onChange={(e) => {
+                      const newIdx = Number(e.target.value);
+                      const newConfig = LANGUAGES[LANG_KEYS[newIdx]];
+                      const isTabValid = newConfig.tabs.some(t => t.id === activeTab);
+                      if (!isTabValid) {
+                        setActiveTab(newConfig.tabs[0].id);
+                      }
+                      setLangIdx(newIdx);
+                    }}
+                    style={{
+                      padding: "6px 28px 6px 14px",
+                      borderRadius: "20px",
+                      background: "rgba(255,255,255,0.2)",
+                      border: "1px solid rgba(255,255,255,0.4)",
+                      color: "#fff",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      transition: "background 0.2s",
+                      appearance: "none",
+                      WebkitAppearance: "none",
+                      outline: "none"
+                    }}
+                  >
+                    {LANG_KEYS.map((key, idx) => (
+                      <option key={key} value={idx} style={{ color: "#333", background: "#fff" }}>
+                        Mode: {LANGUAGES[key].flag} {LANGUAGES[key].name}
+                      </option>
+                    ))}
+                  </select>
+                  <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", fontSize: 10, color: "#fff" }}>▼</div>
+                </div>
               </div>
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", letterSpacing: 3, textTransform: "uppercase", marginBottom: 6 }}>{greeting}</div>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 8 }}>
+                <img src="/logo.png" alt="Pengu" style={{ width: 40, height: 40, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.4)" }} />
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", letterSpacing: 2, textTransform: "uppercase", fontWeight: 600 }}>{greeting}</div>
+              </div>
               <div className="header-title" style={{ fontSize: 36, fontWeight: 700, color: "#fff", letterSpacing: -0.5, textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>{nativeName}</div>
               <div style={{ fontSize: 14, color: "rgba(255,255,255,0.75)", marginTop: 4 }}>Complete {name} Language Learning</div>
             </div>
@@ -1068,24 +1266,52 @@ export default function App() {
 
           {/* Content */}
           <div className="content-wrapper" style={{ maxWidth: 700, margin: "0 auto", padding: "0 20px 40px" }}>
-            {activeTab === "vocab" && <VocabularyTab data={data} />}
-            {activeTab === "grammar" && <GrammarTab data={data} />}
+            {activeTab === "vocab" && <VocabularyTab data={data} gainXP={gainXP} />}
+            {activeTab === "grammar" && <GrammarTab data={data} gainXP={gainXP} />}
             {activeTab === "builder" && (
-              <SentenceBuilderTab data={data} languageStr={name} />
+              <SentenceBuilderTab data={data} languageStr={name} gainXP={gainXP} />
             )}
             {activeTab === "chat" && (
-              <ConversationTab data={data} languageStr={name} />
+              <ConversationTab data={data} languageStr={name} gainXP={gainXP} />
             )}
-            {activeTab === "idioms" && <IdiomsTab data={data} />}
+            {activeTab === "idioms" && <IdiomsTab data={data} gainXP={gainXP} />}
+            {activeTab === "videos" && <VideoTab data={data} gainXP={gainXP} />}
+            {activeTab === "culture" && <CultureTab data={data} gainXP={gainXP} />}
             {activeTab === "alphabet" && (name === "Korean" || name === "Hebrew") && (
               <AlphabetTab
                 alphabetData={name === "Korean" ? data.HANGUL_CATEGORIES : data.ALPHABET_CATEGORIES}
                 langCode={name === "Korean" ? "ko-KR" : "he-IL"}
+                gainXP={gainXP}
               />
             )}
           </div>
         </>
       )}
+
+      {/* Toast Notification */}
+      {showXPToast && (
+        <div style={{
+          position: "fixed", bottom: 40, right: 40, background: "#22c55e", color: "#fff",
+          padding: "16px 24px", borderRadius: 12, boxShadow: "0 10px 25px rgba(34,197,94,0.4)",
+          display: "flex", alignItems: "center", gap: 12, fontSize: 16, fontWeight: 700,
+          animation: "slideIn 0.3s ease-out", zIndex: 1000
+        }}>
+          <span style={{ fontSize: 24 }}>✨</span>
+          <div>
+            <div>{showXPToast.text}</div>
+            {showXPToast.amount > 0 && <div style={{ fontSize: 13, opacity: 0.9 }}>+{showXPToast.amount} XP</div>}
+          </div>
+        </div>
+      )}
+
+      <style>
+        {`
+          @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+          }
+        `}
+      </style>
     </div>
   );
 }

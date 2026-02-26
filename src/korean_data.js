@@ -66,24 +66,99 @@ export const HANGUL_CATEGORIES = [
 ];
 
 export const VOCABULARY = [
-    { it: "안녕하세요", en: "hello", type: "greeting", category: "Basics" },
-    { it: "감사합니다", en: "thank you (formal)", type: "greeting", category: "Basics" },
-    { it: "네", en: "yes", type: "adverb", category: "Basics" },
-    { it: "아니요", en: "no", type: "adverb", category: "Basics" },
-    { it: "물", en: "water", type: "noun", gender: "n/a", category: "Food & Drink" },
-    { it: "밥", en: "rice / meal", type: "noun", gender: "n/a", category: "Food & Drink" },
-    { it: "사람", en: "person", type: "noun", gender: "n/a", category: "People" },
-    { it: "친구", en: "friend", type: "noun", gender: "n/a", category: "People" },
-    { it: "집", en: "house", type: "noun", gender: "n/a", category: "Places" },
-    { it: "학교", en: "school", type: "noun", gender: "n/a", category: "Places" },
-    { it: "개", en: "dog", type: "noun", gender: "n/a", category: "Animals" },
-    { it: "고양이", en: "cat", type: "noun", gender: "n/a", category: "Animals" },
-    { it: "책", en: "book", type: "noun", gender: "n/a", category: "Objects" },
-    { it: "좋다", en: "good", type: "adjective", category: "Adjectives" },
-    { it: "크다", en: "big", type: "adjective", category: "Adjectives" },
-    { it: "작다", en: "small", type: "adjective", category: "Adjectives" },
-    { it: "저", en: "I (formal)", type: "pronoun", category: "Pronouns" },
-    { it: "나", en: "I (informal)", type: "pronoun", category: "Pronouns" }
+    { "it": "좋다", "en": "good", "type": "adjective", "category": "Adjectives", "topic": "Basics & Greetings" },
+    { "it": "안녕하세요", "en": "hello", "type": "greeting", "category": "Basics", "topic": "Basics & Greetings" },
+    { "it": "아니요", "en": "no", "type": "adverb", "category": "Basics", "topic": "Basics & Greetings" },
+    { "it": "감사합니다", "en": "thank you (formal)", "type": "greeting", "category": "Basics", "topic": "Basics & Greetings" },
+    { "it": "네", "en": "yes", "type": "adverb", "category": "Basics", "topic": "Basics & Greetings" },
+    { "it": "친구", "en": "friend", "type": "noun", "gender": "n/a", "category": "People", "topic": "People & Family" },
+    { "it": "사람", "en": "person", "type": "noun", "gender": "n/a", "category": "People", "topic": "People & Family" },
+    { "it": "물", "en": "water", "type": "noun", "gender": "n/a", "category": "Food & Drink", "topic": "Food & Drink" },
+    { "it": "집", "en": "house", "type": "noun", "gender": "n/a", "category": "Places", "topic": "House & Home" },
+    { "it": "고양이", "en": "cat", "type": "noun", "gender": "n/a", "category": "Animals", "topic": "Nature & Animals" },
+    { "it": "개", "en": "dog", "type": "noun", "gender": "n/a", "category": "Animals", "topic": "Nature & Animals" },
+    { "it": "학교", "en": "school", "type": "noun", "gender": "n/a", "category": "Places", "topic": "City & Places" },
+    { "it": "크다", "en": "big", "type": "adjective", "category": "Adjectives", "topic": "Abstract Concepts" },
+    { "it": "작다", "en": "small", "type": "adjective", "category": "Adjectives", "topic": "Abstract Concepts" },
+    { "it": "책", "en": "book", "type": "noun", "gender": "n/a", "category": "Objects", "topic": "Misc & Core Vocab" },
+    { "it": "저", "en": "I (formal)", "type": "pronoun", "category": "Pronouns", "topic": "Misc & Core Vocab" },
+    { "it": "나", "en": "I (informal)", "type": "pronoun", "category": "Pronouns", "topic": "Misc & Core Vocab" },
+    { "it": "밥", "en": "rice / meal", "type": "noun", "gender": "n/a", "category": "Food & Drink", "topic": "Misc & Core Vocab" },
+    { "kr": "안녕히 가세요", "rom": "annyeonghi gaseyo", "en": "goodbye (to someone leaving)", "topic": "Basics & Greetings" },
+    { "kr": "감사합니다", "rom": "gamsahamnida", "en": "thank you", "topic": "Basics & Greetings" },
+    { "kr": "제발", "rom": "jebal", "en": "please", "topic": "Basics & Greetings" },
+    { "kr": "죄송합니다", "rom": "joesonghamnida", "en": "sorry", "topic": "Basics & Greetings" },
+    { "kr": "저기요", "rom": "jeogiyo", "en": "excuse me (to get attention)", "topic": "Basics & Greetings" },
+    { "kr": "환영합니다", "rom": "hwanyeonghamnida", "en": "welcome", "topic": "Basics & Greetings" },
+    { "kr": "가족", "rom": "gajok", "en": "family", "topic": "People & Family" },
+    { "kr": "어머니", "rom": "eomeoni", "en": "mother", "topic": "People & Family" },
+    { "kr": "아버지", "rom": "abeoji", "en": "father", "topic": "People & Family" },
+    { "kr": "아들", "rom": "adeul", "en": "son", "topic": "People & Family" },
+    { "kr": "딸", "rom": "ttal", "en": "daughter", "topic": "People & Family" },
+    { "kr": "오빠", "rom": "oppa", "en": "older brother (for female)", "topic": "People & Family" },
+    { "kr": "형", "rom": "hyeong", "en": "older brother (for male)", "topic": "People & Family" },
+    { "kr": "언니", "rom": "eonni", "en": "older sister (for female)", "topic": "People & Family" },
+    { "kr": "누나", "rom": "nuna", "en": "older sister (for male)", "topic": "People & Family" },
+    { "kr": "동생", "rom": "dongsaeng", "en": "younger sibling", "topic": "People & Family" },
+    { "kr": "남자", "rom": "namja", "en": "man", "topic": "People & Family" },
+    { "kr": "여자", "rom": "yeoja", "en": "woman", "topic": "People & Family" },
+    { "kr": "아이", "rom": "ai", "en": "child", "topic": "People & Family" },
+    { "kr": "음식", "rom": "eumsik", "en": "food", "topic": "Food & Drink" },
+    { "kr": "고기", "rom": "gogi", "en": "meat", "topic": "Food & Drink" },
+    { "kr": "야채", "rom": "yachae", "en": "vegetable", "topic": "Food & Drink" },
+    { "kr": "과일", "rom": "gwail", "en": "fruit", "topic": "Food & Drink" },
+    { "kr": "빵", "rom": "ppang", "en": "bread", "topic": "Food & Drink" },
+    { "kr": "커피", "rom": "keopi", "en": "coffee", "topic": "Food & Drink" },
+    { "kr": "차", "rom": "cha", "en": "tea", "topic": "Food & Drink" },
+    { "kr": "우유", "rom": "uyu", "en": "milk", "topic": "Food & Drink" },
+    { "kr": "술", "rom": "sul", "en": "alcohol", "topic": "Food & Drink" },
+    { "kr": "아침", "rom": "achim", "en": "breakfast / morning", "topic": "Food & Drink" },
+    { "kr": "점심", "rom": "jeomsim", "en": "lunch", "topic": "Food & Drink" },
+    { "kr": "저녁", "rom": "jeonyeok", "en": "dinner / evening", "topic": "Food & Drink" },
+    { "kr": "식당", "rom": "sikdang", "en": "restaurant", "topic": "Food & Drink" },
+    { "kr": "시간", "rom": "sigan", "en": "time", "topic": "Time & Calendar" },
+    { "kr": "오늘", "rom": "oneul", "en": "today", "topic": "Time & Calendar" },
+    { "kr": "내일", "rom": "naeil", "en": "tomorrow", "topic": "Time & Calendar" },
+    { "kr": "어제", "rom": "eoje", "en": "yesterday", "topic": "Time & Calendar" },
+    { "kr": "지금", "rom": "jigeum", "en": "now", "topic": "Time & Calendar" },
+    { "kr": "월요일", "rom": "woryoil", "en": "monday", "topic": "Time & Calendar" },
+    { "kr": "화요일", "rom": "hwayoil", "en": "tuesday", "topic": "Time & Calendar" },
+    { "kr": "수요일", "rom": "suyoil", "en": "wednesday", "topic": "Time & Calendar" },
+    { "kr": "목요일", "rom": "mogyoil", "en": "thursday", "topic": "Time & Calendar" },
+    { "kr": "금요일", "rom": "geumyoil", "en": "friday", "topic": "Time & Calendar" },
+    { "kr": "토요일", "rom": "toyoil", "en": "saturday", "topic": "Time & Calendar" },
+    { "kr": "일요일", "rom": "iryoil", "en": "sunday", "topic": "Time & Calendar" },
+    { "kr": "주", "rom": "ju", "en": "week", "topic": "Time & Calendar" },
+    { "kr": "달", "rom": "dal", "en": "month", "topic": "Time & Calendar" },
+    { "kr": "년", "rom": "nyeon", "en": "year", "topic": "Time & Calendar" },
+    { "kr": "가게", "rom": "gage", "en": "store", "topic": "City & Places" },
+    { "kr": "회사", "rom": "hoesa", "en": "company / workplace", "topic": "City & Places" },
+    { "kr": "병원", "rom": "byeongwon", "en": "hospital", "topic": "City & Places" },
+    { "kr": "은행", "rom": "eunhaeng", "en": "bank", "topic": "City & Places" },
+    { "kr": "공원", "rom": "gongwon", "en": "park", "topic": "City & Places" },
+    { "kr": "거리", "rom": "geori", "en": "street", "topic": "City & Places" },
+    { "kr": "역", "rom": "yeok", "en": "station", "topic": "City & Places" },
+    { "kr": "공항", "rom": "gonghang", "en": "airport", "topic": "City & Places" },
+    { "kr": "하다", "rom": "hada", "en": "to do", "topic": "Action Verbs" },
+    { "kr": "가다", "rom": "gada", "en": "to go", "topic": "Action Verbs" },
+    { "kr": "오다", "rom": "oda", "en": "to come", "topic": "Action Verbs" },
+    { "kr": "먹다", "rom": "meokda", "en": "to eat", "topic": "Action Verbs" },
+    { "kr": "마시다", "rom": "masida", "en": "to drink", "topic": "Action Verbs" },
+    { "kr": "자다", "rom": "jada", "en": "to sleep", "topic": "Action Verbs" },
+    { "kr": "보다", "rom": "boda", "en": "to see / watch", "topic": "Action Verbs" },
+    { "kr": "듣다", "rom": "deutda", "en": "to hear / listen", "topic": "Action Verbs" },
+    { "kr": "말하다", "rom": "marhada", "en": "to speak", "topic": "Action Verbs" },
+    { "kr": "읽다", "rom": "ikda", "en": "to read", "topic": "Action Verbs" },
+    { "kr": "쓰다", "rom": "sseuda", "en": "to write", "topic": "Action Verbs" },
+    { "kr": "사다", "rom": "sada", "en": "to buy", "topic": "Action Verbs" },
+    { "kr": "알다", "rom": "alda", "en": "to know", "topic": "Action Verbs" },
+    { "kr": "모르다", "rom": "moreuda", "en": "to not know", "topic": "Action Verbs" },
+    { "kr": "많다", "rom": "manta", "en": "many / much", "topic": "Descriptive (Adjectives)" },
+    { "kr": "새롭다", "rom": "saeropda", "en": "new", "topic": "Descriptive (Adjectives)" },
+    { "kr": "어렵다", "rom": "eoryeopda", "en": "difficult", "topic": "Descriptive (Adjectives)" },
+    { "kr": "쉽다", "rom": "swipda", "en": "easy", "topic": "Descriptive (Adjectives)" },
+    { "kr": "맛있다", "rom": "masitda", "en": "delicious", "topic": "Descriptive (Adjectives)" },
+    { "kr": "예쁘다", "rom": "yeppeuda", "en": "pretty", "topic": "Descriptive (Adjectives)" }
 ];
 
 // Korean verbs don't conjugate by pronoun, but by politeness level and tense.
@@ -191,4 +266,112 @@ export const CONVERSATION_TOPICS = [
     "Asking for directions to the subway station",
     "Talking about your weekend plans",
     "Discussing favorite movies and music (K-Pop/K-Dramas)"
+];
+
+export const VIDEOS = [
+    {
+        id: "ZinAK6n6cWU",
+        title: "Learn Korean in 20 Minutes - ALL the Basics You Need",
+        channel: "Learn Korean with KoreanClass101.com",
+        thumbnail: "https://img.youtube.com/vi/ZinAK6n6cWU/mqdefault.jpg"
+    },
+    {
+        id: "rBDrM1VPJX0",
+        title: "How to Learn and Read the Korean Alphabet (Hangul) in 10 Minutes🇰🇷 | Learn Korean for Beginners",
+        channel: "Real Korean with Morning",
+        thumbnail: "https://img.youtube.com/vi/rBDrM1VPJX0/mqdefault.jpg"
+    },
+    {
+        id: "EGona9AEtTk",
+        title: "Easiest Ways to Learn Korean for Beginner",
+        channel: "Hailey _Your Korean Friend",
+        thumbnail: "https://img.youtube.com/vi/EGona9AEtTk/mqdefault.jpg"
+    },
+    {
+        id: "C2qBHWE3-t4",
+        title: "How to Learn Korean (AND Have Fun): Beginner's Guide with Pro Tips & Practice Methods",
+        channel: "oh no nina",
+        thumbnail: "https://img.youtube.com/vi/C2qBHWE3-t4/mqdefault.jpg"
+    }
+];
+
+export const CULTURE = [
+    {
+        "id": "yebNIHKAC4A",
+        "title": "“Golden” Official Lyric Video | KPop Demon Hunters | Sony Animation",
+        "channel": "Sony Pictures Animation",
+        "thumbnail": "https://img.youtube.com/vi/yebNIHKAC4A/mqdefault.jpg",
+        "category": "Music"
+    },
+    {
+        "id": "983bBbJx0Mk",
+        "title": "\"Soda Pop\" Official Lyric Video | KPop Demon Hunters | Sony Animation",
+        "channel": "Sony Pictures Animation",
+        "thumbnail": "https://img.youtube.com/vi/983bBbJx0Mk/mqdefault.jpg",
+        "category": "Music"
+    },
+    {
+        "id": "cWppAbqm9I8",
+        "title": "\"Your Idol\" | Official Song Clip | KPop Demon Hunters | Sony Animation",
+        "channel": "Sony Pictures Animation",
+        "thumbnail": "https://img.youtube.com/vi/cWppAbqm9I8/mqdefault.jpg",
+        "category": "Music"
+    },
+    {
+        "id": "GUo9PKtwjHw",
+        "title": "Genie, Make a Wish | Official Teaser | Netflix",
+        "channel": "Netflix K-Content",
+        "thumbnail": "https://img.youtube.com/vi/GUo9PKtwjHw/mqdefault.jpg",
+        "category": "TV Show"
+    },
+    {
+        "id": "F9SZf_QxfeA",
+        "title": "Can This Love Be Translated? | Official Teaser | Netflix",
+        "channel": "Netflix K-Content",
+        "thumbnail": "https://img.youtube.com/vi/F9SZf_QxfeA/mqdefault.jpg",
+        "category": "TV Show"
+    },
+    {
+        "id": "ZYflvue1yIE",
+        "title": "As You Stood By | Official Trailer | Netflix",
+        "channel": "Netflix K-Content",
+        "thumbnail": "https://img.youtube.com/vi/ZYflvue1yIE/mqdefault.jpg",
+        "category": "TV Show"
+    },
+    {
+        "id": "3MVgdmd8ri0",
+        "title": "LOVE 911 (반창꼬) - Trailer",
+        "channel": "Dark Dreams",
+        "thumbnail": "https://img.youtube.com/vi/3MVgdmd8ri0/mqdefault.jpg",
+        "category": "Movie"
+    },
+    {
+        "id": "QHv97oWSBz8",
+        "title": "Target (Official Trailer) in Korean",
+        "channel": "Star Entertainment Trailers",
+        "thumbnail": "https://img.youtube.com/vi/QHv97oWSBz8/mqdefault.jpg",
+        "category": "Movie"
+    },
+    {
+        "id": "ekG9oxWV6Rw",
+        "title": "Once We Were Us (2025) Movie Trailer",
+        "channel": "EonTalk",
+        "thumbnail": "https://img.youtube.com/vi/ekG9oxWV6Rw/mqdefault.jpg",
+        "category": "Movie"
+    }
+];
+
+export const PROGRESSION = [
+    "Basics & Greetings",
+    "People & Family",
+    "Action Verbs",
+    "Descriptive (Adjectives)",
+    "Food & Drink",
+    "Time & Calendar",
+    "Numbers & Math",
+    "City & Places",
+    "House & Home",
+    "Nature & Animals",
+    "Abstract Concepts",
+    "Misc & Core Vocab"
 ];
