@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import * as italianData from "./data";
 import * as koreanData from "./korean_data";
 import * as hebrewData from "./hebrew_data";
@@ -1086,6 +1087,7 @@ export default function App() {
           </div>
         </>
       )}
+      <Analytics />
     </div>
   );
 }
