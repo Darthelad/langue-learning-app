@@ -1094,7 +1094,9 @@ export default function App() {
 
   const currentLangCode = LANG_KEYS[langIdx];
   const config = LANGUAGES[currentLangCode];
-  const { data, tabs, theme, activeColor, name, nativeName, greeting } = config;
+  const { data, tabs, theme, activeColor, name, nativeName, greeting, flag } = config;
+  const shortCodeMap = { 'italian': 'it', 'hebrew': 'he', 'korean': 'ko', 'spanish': 'es' };
+  const shortCode = shortCodeMap[currentLangCode] || 'it';
 
 
 
@@ -1223,9 +1225,11 @@ export default function App() {
                   <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", fontSize: 10, color: "#fff" }}>▼</div>
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 12, marginBottom: 8 }}>
-                <img src="/logo.png" alt="Pengu" style={{ width: 40, height: 40, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.4)" }} />
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.9)", letterSpacing: 2, textTransform: "uppercase", fontWeight: 600 }}>{greeting}</div>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 16, marginBottom: 12 }}>
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <img src={`/logo_${shortCode}.png`} alt="Pengu" style={{ width: 64, height: 64, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.5)", backgroundColor: "#fff" }} />
+                </div>
+                <div style={{ fontSize: 15, color: "rgba(255,255,255,0.9)", letterSpacing: 2, textTransform: "uppercase", fontWeight: 600 }}>{greeting}</div>
               </div>
               <div className="header-title" style={{ fontSize: 36, fontWeight: 700, color: "#fff", letterSpacing: -0.5, textShadow: "0 2px 8px rgba(0,0,0,0.3)" }}>{nativeName}</div>
               <div style={{ fontSize: 14, color: "rgba(255,255,255,0.75)", marginTop: 4 }}>Complete {name} Language Learning</div>
