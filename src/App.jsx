@@ -3,6 +3,10 @@ import * as italianData from "./data";
 import * as koreanData from "./korean_data";
 import * as hebrewData from "./hebrew_data";
 import * as spanishData from "./spanish_data";
+import * as englishData from "./english_data";
+import * as russianData from "./russian_data";
+import * as portugueseData from "./portuguese_data";
+import * as frenchData from "./french_data";
 
 // ── UTILITY ──────────────────────────────────────────────────────────────────
 function shuffle(arr) {
@@ -1045,10 +1049,86 @@ const LANGUAGES = {
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" }
     ]
+  },
+  english: {
+    id: "english",
+    name: "English",
+    nativeName: "English",
+    flag: "🇬🇧",
+    greeting: "Welcome",
+    theme: "linear-gradient(135deg, #1C2833 0%, #2E4053 50%, #34495E 100%)",
+    activeColor: "#2E4053",
+    data: englishData,
+    tabs: [
+      { id: "vocab", label: "Vocabulary", icon: "📖" },
+      { id: "grammar", label: "Grammar", icon: "✏️" },
+      { id: "builder", label: "Sentence Builder", icon: "🔨" },
+      { id: "chat", label: "Conversation", icon: "💬" },
+      { id: "idioms", label: "Phrases & Idioms", icon: "🇬🇧" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
+    ]
+  },
+  russian: {
+    id: "russian",
+    name: "Russian",
+    nativeName: "Русский",
+    flag: "🇷🇺",
+    greeting: "Добро пожаловать",
+    theme: "linear-gradient(135deg, #7B241C 0%, #922B21 50%, #A93226 100%)",
+    activeColor: "#922B21",
+    data: russianData,
+    tabs: [
+      { id: "vocab", label: "Vocabulary", icon: "📖" },
+      { id: "grammar", label: "Grammar", icon: "✏️" },
+      { id: "builder", label: "Sentence Builder", icon: "🔨" },
+      { id: "chat", label: "Conversation", icon: "💬" },
+      { id: "idioms", label: "Phrases & Idioms", icon: "🇷🇺" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
+    ]
+  },
+  portuguese: {
+    id: "portuguese",
+    name: "Portuguese",
+    nativeName: "Português",
+    flag: "🇵🇹",
+    greeting: "Bem-vindo",
+    theme: "linear-gradient(135deg, #006600 0%, #009900 50%, #FF0000 100%)",
+    activeColor: "#006600",
+    data: portugueseData,
+    tabs: [
+      { id: "vocab", label: "Vocabulary", icon: "📖" },
+      { id: "grammar", label: "Grammar", icon: "✏️" },
+      { id: "builder", label: "Sentence Builder", icon: "🔨" },
+      { id: "chat", label: "Conversation", icon: "💬" },
+      { id: "idioms", label: "Phrases & Idioms", icon: "🇵🇹" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
+    ]
+  },
+  french: {
+    id: "french",
+    name: "French",
+    nativeName: "Français",
+    flag: "🇫🇷",
+    greeting: "Bienvenue",
+    theme: "linear-gradient(135deg, #002395 0%, #ffffff 50%, #ED2939 100%)",
+    activeColor: "#002395",
+    data: frenchData,
+    tabs: [
+      { id: "vocab", label: "Vocabulary", icon: "📖" },
+      { id: "grammar", label: "Grammar", icon: "✏️" },
+      { id: "builder", label: "Sentence Builder", icon: "🔨" },
+      { id: "chat", label: "Conversation", icon: "💬" },
+      { id: "idioms", label: "Phrases & Idioms", icon: "🇫🇷" },
+      { id: "videos", label: "Videos", icon: "📺" },
+      { id: "culture", label: "Culture", icon: "🎭" }
+    ]
   }
 };
 
-const LANG_KEYS = ["italian", "korean", "hebrew", "spanish"];
+const LANG_KEYS = ["english", "spanish", "italian", "hebrew", "russian", "korean", "portuguese", "french"];
 
 export default function App() {
   const [currentView, setCurrentView] = useState("home"); // 'home' or 'learning'
@@ -1095,7 +1175,7 @@ export default function App() {
   const currentLangCode = LANG_KEYS[langIdx];
   const config = LANGUAGES[currentLangCode];
   const { data, tabs, theme, activeColor, name, nativeName, greeting, flag } = config;
-  const shortCodeMap = { 'italian': 'it', 'hebrew': 'he', 'korean': 'ko', 'spanish': 'es' };
+  const shortCodeMap = { 'italian': 'it', 'hebrew': 'he', 'korean': 'ko', 'spanish': 'es', 'english': 'en', 'russian': 'ru', 'portuguese': 'pt', 'french': 'fr' };
   const shortCode = shortCodeMap[currentLangCode] || 'it';
 
 
