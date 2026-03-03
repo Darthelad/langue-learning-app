@@ -8,6 +8,8 @@ import * as russianData from "./russian_data";
 import * as portugueseData from "./portuguese_data";
 import * as frenchData from "./french_data";
 
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+
 // ── UTILITY ──────────────────────────────────────────────────────────────────
 function shuffle(arr) {
   const a = [...arr];
@@ -869,6 +871,85 @@ function DashboardTab({ userXP, userLevel, completedItems, cefrThresholds, activ
   );
 }
 
+// ── POLYGLOT DASHBOARD ────────────────────────────────────────────────────────
+function PolyglotDashboard({ onClose }) {
+  const [profiles, setProfiles] = useState({});
+
+  useEffect(() => {
+    setProfiles(JSON.parse(localStorage.getItem('langue_profiles') || '{}'));
+  }, []);
+
+  const chartData = LANG_KEYS.map(key => {
+    const xp = profiles[key]?.xp || 0;
+    return {
+      subject: LANGUAGES[key].name,
+      xp: xp,
+      fullMark: 100000
+    };
+  });
+
+  const totalXP = Object.values(profiles).reduce((sum, p) => sum + (p.xp || 0), 0);
+
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+      background: "rgba(0,0,0,0.8)", zIndex: 9999, display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 20
+    }}>
+      <div style={{
+        background: "#fff", borderRadius: 24, padding: 30, width: "100%", maxWidth: 800,
+        maxHeight: "90vh", overflowY: "auto", position: "relative"
+      }}>
+        <button onClick={onClose} style={{
+          position: "absolute", top: 20, right: 20, background: "rgba(0,0,0,0.05)",
+          border: "none", borderRadius: "50%", width: 36, height: 36,
+          cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center"
+        }}>✕</button>
+
+        <h2 style={{ fontSize: 32, margin: "0 0 10px 0", color: "#333", textAlign: "center" }}>🌍 Global Polyglot Profile</h2>
+        <p style={{ textAlign: "center", color: "#666", marginBottom: 30 }}>Total Lifetime XP: <strong style={{ color: "#4ade80" }}>{totalXP}</strong></p>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 20 }}>
+          {/* Radar Chart side */}
+          <div style={{ flex: "1 1 400px", height: 400, background: "#f8f9fa", borderRadius: 16, padding: 10 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                <PolarGrid stroke="#e0e0e0" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#555', fontSize: 12, fontWeight: 600 }} />
+                <PolarRadiusAxis angle={30} domain={[0, 'dataMax + 1000']} tick={false} axisLine={false} />
+                <Radar name="XP" dataKey="xp" stroke="#4ade80" fill="#4ade80" fillOpacity={0.6} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* List side */}
+          <div style={{ flex: "1 1 250px", display: "flex", flexDirection: "column", gap: 12 }}>
+            {LANG_KEYS.sort((a, b) => (profiles[b]?.xp || 0) - (profiles[a]?.xp || 0)).map(key => {
+              const p = profiles[key] || { xp: 0, level: "A1" };
+              return (
+                <div key={key} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "12px 16px", background: "#f8f9fa", borderRadius: 12, border: "1px solid #eee"
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: 24 }}>{LANGUAGES[key].flag}</span>
+                    <span style={{ fontWeight: 600, color: "#333" }}>{LANGUAGES[key].name}</span>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontWeight: 800, color: LANGUAGES[key].activeColor }}>{p.level}</div>
+                    <div style={{ fontSize: 12, color: "#777" }}>{p.xp} XP</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 // ── BUTTON STYLE ──────────────────────────────────────────────────────────────
 function btnStyle(bg, color) {
   return {
@@ -1201,65 +1282,78 @@ const LANGUAGES = {
 
 const LANG_KEYS = ["english", "spanish", "italian", "hebrew", "russian", "korean", "portuguese", "french"];
 
+const CEFR_THRESHOLDS = [
+  { level: "A1", min: 0, max: 5000 },
+  { level: "A2", min: 5000, max: 15000 },
+  { level: "B1", min: 15000, max: 30000 },
+  { level: "B2", min: 30000, max: 60000 },
+  { level: "C1", min: 60000, max: 100000 },
+  { level: "C2", min: 100000, max: Infinity }
+];
+
 export default function App() {
   const [currentView, setCurrentView] = useState("home"); // 'home' or 'learning'
+  const [showPolyglotDashboard, setShowPolyglotDashboard] = useState(false);
   const [langIdx, setLangIdx] = useState(0);
   const [activeTab, setActiveTab] = useState("vocab");
 
   const [userXP, setUserXP] = useState(0);
-  const [userLevel, setUserLevel] = useState(1);
+  const [userLevel, setUserLevel] = useState("A1");
   const [completedItems, setCompletedItems] = useState({});
   const [showXPToast, setShowXPToast] = useState(null);
 
+  // Load profile data whenever the language changes
   useEffect(() => {
-    const xp = parseInt(localStorage.getItem('langue_xp') || '0');
-    const levelStr = localStorage.getItem('langue_cefr_level') || 'A1';
-    const completed = JSON.parse(localStorage.getItem('langue_completed') || '{}');
+    const currentLang = LANG_KEYS[langIdx];
+    const profiles = JSON.parse(localStorage.getItem('langue_profiles') || '{}');
+
+    // If no profile exists for this language, initialize one
+    if (!profiles[currentLang]) {
+      profiles[currentLang] = { xp: 0, level: "A1", completed: {} };
+      localStorage.setItem('langue_profiles', JSON.stringify(profiles));
+    }
+
+    const { xp, level, completed } = profiles[currentLang];
     setUserXP(xp);
-    setUserLevel(levelStr);
+    setUserLevel(level);
     setCompletedItems(completed);
-  }, []);
+  }, [langIdx]);
 
   const gainXP = (amount, itemId) => {
     if (itemId && completedItems[itemId]) return; // Already completed
 
+    const currentLang = LANG_KEYS[langIdx];
     const newCompleted = itemId ? { ...completedItems, [itemId]: true } : completedItems;
-    const newXP = userXP + amount;
 
-    const cefrThresholds = [
-      { level: "A1", min: 0, max: 1500 },
-      { level: "A2", min: 1500, max: 4000 },
-      { level: "B1", min: 4000, max: 8000 },
-      { level: "B2", min: 8000, max: 15000 },
-      { level: "C1", min: 15000, max: 30000 },
-      { level: "C2", min: 30000, max: Infinity }
-    ];
+    // Check for Weakest Language Multiplier
+    const profiles = JSON.parse(localStorage.getItem('langue_profiles') || '{}');
+    const allXPs = LANG_KEYS.map(key => profiles[key]?.xp || 0);
+    const minXP = Math.min(...allXPs.filter(x => x > 0).length ? allXPs.filter(x => x > 0) : [0]);
+    const isWeakest = (userXP <= minXP) && (amount > 0);
 
-    const newLevelObj = cefrThresholds.find(t => newXP >= t.min && newXP < t.max) || cefrThresholds[cefrThresholds.length - 1];
+    const finalAmount = isWeakest ? amount * 2 : amount;
+    const newXP = userXP + finalAmount;
+
+    const newLevelObj = CEFR_THRESHOLDS.find(t => newXP >= t.min && newXP < t.max) || CEFR_THRESHOLDS[CEFR_THRESHOLDS.length - 1];
     const newLevelStr = newLevelObj.level;
 
     setUserXP(newXP);
     setUserLevel(newLevelStr);
     setCompletedItems(newCompleted);
 
-    localStorage.setItem('langue_xp', newXP);
-    localStorage.setItem('langue_cefr_level', newLevelStr);
-    localStorage.setItem('langue_completed', JSON.stringify(newCompleted));
+    // Save to global profiles object
+    profiles[currentLang] = { xp: newXP, level: newLevelStr, completed: newCompleted };
+    localStorage.setItem('langue_profiles', JSON.stringify(profiles));
 
-    setShowXPToast({ amount, text: newLevelStr !== userLevel ? `Rank Up! You reached ${newLevelStr}` : '+XP' });
+    let toastText = newLevelStr !== userLevel ? `Rank Up! You reached ${newLevelStr}` : `+${finalAmount} XP`;
+    if (isWeakest && newLevelStr === userLevel) toastText += " (x2 Weak Lang Bonus!)";
+
+    setShowXPToast({ amount: finalAmount, text: toastText });
     setTimeout(() => setShowXPToast(null), 3000);
   };
 
   const getProgressProps = () => {
-    const cefrThresholds = [
-      { level: "A1", min: 0, max: 1500 },
-      { level: "A2", min: 1500, max: 4000 },
-      { level: "B1", min: 4000, max: 8000 },
-      { level: "B2", min: 8000, max: 15000 },
-      { level: "C1", min: 15000, max: 30000 },
-      { level: "C2", min: 30000, max: Infinity }
-    ];
-    const currentObj = cefrThresholds.find(t => userLevel === t.level) || cefrThresholds[0];
+    const currentObj = CEFR_THRESHOLDS.find(t => userLevel === t.level) || CEFR_THRESHOLDS[0];
     const range = currentObj.max === Infinity ? 1 : (currentObj.max - currentObj.min);
     const progressIntoLevel = userXP - currentObj.min;
     const percentage = currentObj.max === Infinity ? 100 : Math.min(100, (progressIntoLevel / range) * 100);
@@ -1290,6 +1384,19 @@ export default function App() {
             <img src="/logo.png" alt="Pengu Glot" style={{ width: 140, height: 140, marginBottom: 20, borderRadius: 24, boxShadow: "0 8px 30px rgba(0,0,0,0.3)" }} />
             <h1 style={{ fontSize: "4rem", color: "#fff", margin: 0, textShadow: "0 4px 12px rgba(0,0,0,0.3)", letterSpacing: "-1px" }}>Pengu Glot</h1>
             <p style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.8)", marginTop: 10 }}>Select a language to begin your journey</p>
+
+            <button
+              onClick={() => setShowPolyglotDashboard(true)}
+              style={{
+                marginTop: 20, padding: "12px 24px", borderRadius: 30, background: "rgba(255,255,255,0.2)",
+                border: "2px solid rgba(255,255,255,0.5)", color: "#fff", fontSize: 16, fontWeight: 700,
+                cursor: "pointer", transition: "all 0.2s", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", gap: 8
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.3)"; e.currentTarget.style.transform = "scale(1.05)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.transform = "scale(1)"; }}
+            >
+              <span>🌍</span> Global Polyglot Profile
+            </button>
           </div>
 
           <div style={{ display: "flex", gap: 30, flexWrap: "wrap", justifyContent: "center", maxWidth: 1000 }}>
@@ -1328,6 +1435,8 @@ export default function App() {
               );
             })}
           </div>
+
+          {showPolyglotDashboard && <PolyglotDashboard onClose={() => setShowPolyglotDashboard(false)} />}
         </div>
       ) : (
         <>
