@@ -1142,10 +1142,10 @@ export default function App() {
 
   useEffect(() => {
     const xp = parseInt(localStorage.getItem('langue_xp') || '0');
-    const level = parseInt(localStorage.getItem('langue_level') || '1');
+    const levelStr = localStorage.getItem('langue_cefr_level') || 'A1';
     const completed = JSON.parse(localStorage.getItem('langue_completed') || '{}');
     setUserXP(xp);
-    setUserLevel(level);
+    setUserLevel(levelStr);
     setCompletedItems(completed);
   }, []);
 
@@ -1155,21 +1155,44 @@ export default function App() {
     const newCompleted = itemId ? { ...completedItems, [itemId]: true } : completedItems;
     const newXP = userXP + amount;
 
-    let newLevel = 1;
-    while (50 * newLevel * (newLevel + 1) <= newXP) {
-      newLevel++;
-    }
+    const cefrThresholds = [
+      { level: "A1", min: 0, max: 1500 },
+      { level: "A2", min: 1500, max: 4000 },
+      { level: "B1", min: 4000, max: 8000 },
+      { level: "B2", min: 8000, max: 15000 },
+      { level: "C1", min: 15000, max: 30000 },
+      { level: "C2", min: 30000, max: Infinity }
+    ];
+
+    const newLevelObj = cefrThresholds.find(t => newXP >= t.min && newXP < t.max) || cefrThresholds[cefrThresholds.length - 1];
+    const newLevelStr = newLevelObj.level;
 
     setUserXP(newXP);
-    setUserLevel(newLevel);
+    setUserLevel(newLevelStr);
     setCompletedItems(newCompleted);
 
     localStorage.setItem('langue_xp', newXP);
-    localStorage.setItem('langue_level', newLevel);
+    localStorage.setItem('langue_cefr_level', newLevelStr);
     localStorage.setItem('langue_completed', JSON.stringify(newCompleted));
 
-    setShowXPToast({ amount, text: newLevel > userLevel ? `Level Up! You are now Level ${newLevel}` : '+XP' });
+    setShowXPToast({ amount, text: newLevelStr !== userLevel ? `Rank Up! You reached ${newLevelStr}` : '+XP' });
     setTimeout(() => setShowXPToast(null), 3000);
+  };
+
+  const getProgressProps = () => {
+    const cefrThresholds = [
+      { level: "A1", min: 0, max: 1500 },
+      { level: "A2", min: 1500, max: 4000 },
+      { level: "B1", min: 4000, max: 8000 },
+      { level: "B2", min: 8000, max: 15000 },
+      { level: "C1", min: 15000, max: 30000 },
+      { level: "C2", min: 30000, max: Infinity }
+    ];
+    const currentObj = cefrThresholds.find(t => userLevel === t.level) || cefrThresholds[0];
+    const range = currentObj.max === Infinity ? 1 : (currentObj.max - currentObj.min);
+    const progressIntoLevel = userXP - currentObj.min;
+    const percentage = currentObj.max === Infinity ? 100 : Math.min(100, (progressIntoLevel / range) * 100);
+    return { percentage, currentObj };
   };
 
   const currentLangCode = LANG_KEYS[langIdx];
@@ -1260,10 +1283,10 @@ export default function App() {
                   padding: "4px 10px", display: "flex", alignItems: "center", gap: 8, color: "#fff", fontSize: 13, fontWeight: 600,
                   whiteSpace: "nowrap"
                 }}>
-                  <span style={{ fontSize: 16 }} title={`${userXP} total XP`}>⭐</span> Lvl {userLevel}
-                  <div style={{ width: 50, height: 6, background: "rgba(0,0,0,0.3)", borderRadius: 3, overflow: "hidden" }}>
+                  <span style={{ fontSize: 16 }} title={`${userXP} total XP`}>⭐</span> {userLevel}
+                  <div style={{ width: 50, height: 6, background: "rgba(0,0,0,0.3)", borderRadius: 3, overflow: "hidden" }} title={`${userXP} / ${getProgressProps().currentObj.max === Infinity ? 'MAX' : getProgressProps().currentObj.max} XP`}>
                     <div style={{
-                      width: `${Math.min(100, (userXP - (50 * (userLevel - 1) * userLevel)) / (100 * userLevel) * 100)}%`,
+                      width: `${getProgressProps().percentage}%`,
                       background: "#4ade80", height: "100%", transition: "width 0.3s ease"
                     }} />
                   </div>
