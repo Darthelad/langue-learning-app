@@ -899,14 +899,27 @@ function PlacementTestTab({ data, gainXP }) {
   const [readingAnswer, setReadingAnswer] = useState(null);
   const [readingChecked, setReadingChecked] = useState(false);
 
-  const startTest = () => {
-    // Pick a random sentence for dictation
-    const sentencePool = data.SENTENCES || [];
-    if (sentencePool.length > 0) {
-      setListeningTarget(sentencePool[Math.floor(Math.random() * sentencePool.length)]);
+  const startTest = async () => {
+    setTestState("loading_dictation");
+    setScore(0);
+    try {
+      const prompt = `Write a single random B1-level short conversational sentence in ${data.name} for a dictation test. Output ONLY a valid JSON object with 'native' (the sentence) and 'english' (translation). No markdown ticks.`;
+      const response = await callGemini([{ role: "user", content: prompt }], "You are a language teacher. Output ONLY raw JSON.");
+      let cleanRes = response.trim();
+      if (cleanRes.startsWith("\`\`\`json")) cleanRes = cleanRes.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
+      if (cleanRes.startsWith("\`\`\`")) cleanRes = cleanRes.replace(/\`\`\`/g, "");
+      const parsed = JSON.parse(cleanRes);
+      setListeningTarget(parsed);
+    } catch (err) {
+      console.error("Failed dictation generation:", err);
+      if (data.IDIOMS && data.IDIOMS.length > 0) {
+        const randomIdiom = data.IDIOMS[Math.floor(Math.random() * data.IDIOMS.length)];
+        setListeningTarget({ native: randomIdiom.phrase, english: randomIdiom.meaning });
+      } else {
+        setListeningTarget({ native: "Error Loading Data", english: "Error" });
+      }
     }
     setTestState("listening");
-    setScore(0);
   };
 
   const playAudio = (text) => {
@@ -996,6 +1009,15 @@ function PlacementTestTab({ data, gainXP }) {
           Your performance will determine your initial CEFR Rank and award a lump-sum XP bonus.
         </p>
         <button onClick={startTest} style={btnStyle("#4ade80", "#fff")}>Begin Assessment →</button>
+      </div>
+    );
+  }
+
+  if (testState === "loading_dictation") {
+    return (
+      <div style={{ textAlign: "center", padding: 40, color: "#888", fontSize: 18, background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", maxWidth: 700, margin: "0 auto" }}>
+        <div style={{ fontSize: "3rem", marginBottom: 20, animation: "bounce 1s infinite" }}>⏳</div>
+        Generating your custom AI Dictation prompt...
       </div>
     );
   }
@@ -1124,6 +1146,240 @@ function PlacementTestTab({ data, gainXP }) {
   }
 
   return null;
+}
+
+// ── SPEAKING TAB ──────────────────────────────────────────────────────────────
+function SpeakingTab({ data, gainXP, activeColor }) {
+  const [items, setItems] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState("");
+  const [feedback, setFeedback] = useState(null);
+  const [recognition, setRecognition] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
+
+  useEffect(() => {
+    async function initSentences() {
+      setLoading(true);
+      try {
+        const prompt = `Generate 5 random, unique B1-level conversational sentences in ${data.name} for a language learner to practice speaking. Output ONLY a valid JSON array of objects with 'native' (the sentence) and 'english' (the English translation). No markdown ticks.`;
+        const res = await callGemini([{ role: "user", content: prompt }], "You are a helpful language generator. Output raw JSON ONLY.");
+        let clean = res.trim();
+        if (clean.startsWith("\`\`\`json")) clean = clean.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
+        if (clean.startsWith("\`\`\`")) clean = clean.replace(/\`\`\`/g, "");
+        const parsed = JSON.parse(clean);
+        setItems(parsed);
+      } catch (e) {
+        console.error("Gemini failed, using fallback Idioms", e);
+        const fallback = (data.IDIOMS || []).map(i => ({ native: i.phrase, english: i.meaning }));
+        setItems(fallback);
+      }
+      setLoading(false);
+    }
+
+    initSentences();
+
+    // Initialize Web Speech API
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recog = new SpeechRecognition();
+      recog.continuous = false;
+      recog.interimResults = true;
+      recog.lang = langMap[data.name] || "en-US";
+
+      recog.onresult = (event) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        console.log("Speech API Transcript:", currentTranscript);
+        setTranscript(currentTranscript);
+      };
+
+      recog.onend = () => {
+        console.log("Speech API ended");
+        setIsRecording(false);
+      };
+
+      recog.onerror = (event) => {
+        console.error("Speech recognition error:", event.error, event);
+        alert(`Speech recognition error: ${event.error}. Please ensure your microphone is connected and permitted.`);
+        setIsRecording(false);
+      };
+
+      setRecognition(recog);
+      console.log("Speech Recognition initialized successfully.", recog);
+    }
+  }, [data]);
+
+  const toggleRecording = () => {
+    if (!recognition) {
+      alert("Speech Recognition API is not supported or failed to initialize in this browser. Try Chrome desktop.");
+      return;
+    }
+
+    if (isRecording) {
+      console.log("Stopping recording...");
+      recognition.stop();
+    } else {
+      console.log("Starting recording...");
+      setTranscript("");
+      setFeedback(null);
+      try {
+        recognition.start();
+        setIsRecording(true);
+      } catch (e) {
+        console.error("Failed to start recognition:", e);
+        alert(`Failed to start recording: ${e.message}`);
+      }
+    }
+  };
+
+  const evaluateSpeech = () => {
+    if (!transcript.trim()) return;
+    const target = items[currentIndex].native;
+
+    // Clean string utility
+    const cleanStr = str => str.toLowerCase().replace(/[.,!?;¿¡]/g, '').trim();
+
+    const targetWords = cleanStr(target).split(/\s+/);
+    const spokenWords = cleanStr(transcript).split(/\s+/);
+
+    let correctCount = 0;
+    const wordFeedback = targetWords.map(targetWord => {
+      // Very simple greedy match (exact or very close substitution could be added, doing exact for now)
+      const isCorrect = spokenWords.includes(targetWord);
+      if (isCorrect) correctCount++;
+      return { text: targetWord, correct: isCorrect };
+    });
+
+    const score = targetWords.length > 0 ? (correctCount / targetWords.length) * 100 : 0;
+
+    setFeedback({
+      score: Math.round(score),
+      words: wordFeedback
+    });
+
+    // Check passing threshold (lets say 70% of words recognized)
+    if (score >= 70) {
+      gainXP(10, `speaking-${items[currentIndex]?.id || Date.now()}`);
+    }
+  };
+
+  const nextSentence = () => {
+    setFeedback(null);
+    setTranscript("");
+    setCurrentIndex(prev => (prev + 1) % items.length);
+  };
+
+  const item = items[currentIndex];
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: 40, color: "#888", fontSize: 18 }}>
+        <div style={{ fontSize: "3rem", marginBottom: 20, animation: "bounce 1s infinite" }}>🎙️</div>
+        Generating pronunciation exercises using AI...
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return <div style={{ textAlign: "center", padding: 40, color: "#888" }}>No sentences available for speaking practice.</div>;
+  }
+
+  return (
+    <div style={{ padding: "40px 20px" }}>
+      <h2 style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 8, textAlign: "center" }}>Pronunciation Trainer</h2>
+      <p style={{ textAlign: "center", color: "#666", marginBottom: 40 }}>Read the sentence aloud to get AI feedback.</p>
+
+      <div style={{ background: "#fff", padding: "40px", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 400 }}>
+
+        <div style={{ fontSize: 28, fontWeight: 800, color: activeColor, marginBottom: 12 }}>
+          {item.native}
+        </div>
+        <div style={{ fontSize: 16, color: "#64748b", fontStyle: "italic", marginBottom: 40 }}>
+          "{item.english}"
+        </div>
+
+        {/* Microphone Button */}
+        {!feedback && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+            <button
+              onClick={toggleRecording}
+              className={isRecording ? "pulse-record" : ""}
+              style={{
+                width: 90, height: 90, borderRadius: "50%",
+                background: isRecording ? "#ef4444" : "#f1f5f9",
+                border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.3s",
+                boxShadow: isRecording ? "0 0 0 8px rgba(239, 68, 68, 0.2)" : "0 4px 12px rgba(0,0,0,0.05)"
+              }}
+            >
+              <span style={{ fontSize: 36, color: isRecording ? "#fff" : activeColor }}>🎙️</span>
+            </button>
+            <div style={{ fontSize: 14, fontWeight: 600, color: isRecording ? "#ef4444" : "#64748b" }}>
+              {isRecording ? "Listening... (Click to Stop)" : "Click mic to speak"}
+            </div>
+          </div>
+        )}
+
+        {/* Live Transcript or Final Validation */}
+        <div style={{ marginTop: 30, width: "100%", maxWidth: 500, minHeight: 60 }}>
+          {transcript && !feedback && (
+            <div style={{ padding: 16, background: "#f8fafc", borderRadius: 12, border: "1px dashed #cbd5e1", color: "#334155", fontSize: 18 }}>
+              "{transcript}"
+            </div>
+          )}
+
+          {!isRecording && transcript && !feedback && (
+            <button onClick={evaluateSpeech} style={{ ...btnStyle(activeColor, "#fff"), marginTop: 20, padding: "12px 30px" }}>
+              Evaluate My Pronunciation
+            </button>
+          )}
+
+          {feedback && (
+            <div style={{ animation: "fadeIn 0.4s ease" }}>
+              <div style={{ fontSize: 48, fontWeight: 800, color: feedback.score >= 70 ? "#22c55e" : "#eab308", marginBottom: 10 }}>
+                {feedback.score}%
+              </div>
+              <div style={{ fontSize: 16, color: "#64748b", marginBottom: 20 }}>Accuracy</div>
+
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 30 }}>
+                {feedback.words.map((wf, idx) => (
+                  <span key={idx} style={{
+                    padding: "4px 10px", borderRadius: 8, fontSize: 18, fontWeight: 600,
+                    background: wf.correct ? "#dcfce7" : "#fee2e2",
+                    color: wf.correct ? "#166534" : "#991b1b"
+                  }}>
+                    {wf.text}
+                  </span>
+                ))}
+              </div>
+
+              <button onClick={nextSentence} style={{ ...btnStyle("#333", "#fff"), padding: "14px 40px" }}>
+                Next Sentence →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <style>
+        {`
+          @keyframes pulseRecord {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+          }
+          .pulse-record {
+            animation: pulseRecord 1.5s infinite;
+          }
+        `}
+      </style>
+    </div>
+  );
 }
 
 // ── POLYGLOT DASHBOARD ────────────────────────────────────────────────────────
@@ -1457,7 +1713,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🇮🇹" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   korean: {
@@ -1478,7 +1735,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🎎" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   hebrew: {
@@ -1499,7 +1757,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🐪" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   spanish: {
@@ -1519,7 +1778,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🇪🇸" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   english: {
@@ -1539,7 +1799,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🇬🇧" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   russian: {
@@ -1559,7 +1820,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🇷🇺" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   portuguese: {
@@ -1579,7 +1841,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🇵🇹" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   },
   french: {
@@ -1599,7 +1862,8 @@ const LANGUAGES = {
       { id: "idioms", label: "Phrases & Idioms", icon: "🇫🇷" },
       { id: "videos", label: "Videos", icon: "📺" },
       { id: "culture", label: "Culture", icon: "🎭" },
-      { id: "placement", label: "Placement Test", icon: "🎓" }
+      { id: "placement", label: "Placement Test", icon: "🎓" },
+      { id: "speaking", label: "Speaking", icon: "🎙️" }
     ]
   }
 };
@@ -1930,6 +2194,9 @@ export default function App() {
             )}
             {activeTab === "placement" && (
               <PlacementTestTab data={data} gainXP={gainXP} />
+            )}
+            {activeTab === "speaking" && (
+              <SpeakingTab data={data} gainXP={gainXP} activeColor={activeColor} />
             )}
           </div>
         </>
