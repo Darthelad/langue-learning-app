@@ -872,6 +872,65 @@ function DashboardTab({ userXP, userLevel, completedItems, cefrThresholds, activ
 }
 
 // ── POLYGLOT DASHBOARD ────────────────────────────────────────────────────────
+const getRankBadge = (level) => {
+  switch (level) {
+    case 'A1': return '⭐';
+    case 'A2': return '🥉';
+    case 'B1': return '🥈';
+    case 'B2': return '🥇';
+    case 'C1': return '💎';
+    case 'C2': return '👑';
+    default: return '⭐';
+  }
+};
+
+function LevelUpModal({ level, langName, onClose, activeColor }) {
+  return (
+    <div style={{
+      position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+      background: "rgba(0,0,0,0.85)", zIndex: 99999, display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 20,
+      backdropFilter: "blur(8px)", animation: "fadeIn 0.4s ease-out"
+    }}>
+      <div style={{
+        background: "#fff", borderRadius: 32, padding: "50px 40px",
+        width: "100%", maxWidth: 500, textAlign: "center",
+        boxShadow: `0 20px 60px ${activeColor}66`, position: "relative",
+        animation: "scaleUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+      }}>
+
+        <div style={{ fontSize: "6rem", marginBottom: 20, animation: "bounce 2s infinite" }}>
+          {getRankBadge(level)}
+        </div>
+
+        <div style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: 3, color: "#888", fontWeight: 700, marginBottom: 12 }}>
+          Digital Certificate Achieved
+        </div>
+
+        <h2 style={{ fontSize: 42, margin: "0 0 10px 0", color: activeColor, fontWeight: 900 }}>
+          {level} Rank
+        </h2>
+
+        <p style={{ fontSize: 18, color: "#555", lineHeight: 1.5, marginBottom: 40 }}>
+          Congratulations! You have reached a new milestone evaluating your proficiency in <strong>{langName}</strong>.
+        </p>
+
+        <button onClick={onClose} style={{
+          background: `linear-gradient(135deg, ${activeColor}dd 0%, ${activeColor} 100%)`,
+          color: "#fff", border: "none", borderRadius: 30, padding: "16px 40px",
+          fontSize: 18, fontWeight: 800, cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s",
+          boxShadow: `0 8px 24px ${activeColor}66`
+        }}
+          onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 12px 28px ${activeColor}88`; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = `0 8px 24px ${activeColor}66`; }}
+        >
+          Continue Learning
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function PolyglotDashboard({ onClose }) {
   const [profiles, setProfiles] = useState({});
 
@@ -936,8 +995,10 @@ function PolyglotDashboard({ onClose }) {
                     <span style={{ fontWeight: 600, color: "#333" }}>{LANGUAGES[key].name}</span>
                   </div>
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ fontWeight: 800, color: LANGUAGES[key].activeColor }}>{p.level}</div>
-                    <div style={{ fontSize: 12, color: "#777" }}>{p.xp} XP</div>
+                    <div style={{ fontWeight: 800, color: LANGUAGES[key].activeColor, display: "flex", alignItems: "center", gap: 4 }}>
+                      <span style={{ fontSize: 16 }}>{getRankBadge(p.level)}</span> {p.level}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#777" }}>{p.xp.toLocaleString()} XP</div>
                   </div>
                 </div>
               );
@@ -1301,6 +1362,7 @@ export default function App() {
   const [userLevel, setUserLevel] = useState("A1");
   const [completedItems, setCompletedItems] = useState({});
   const [showXPToast, setShowXPToast] = useState(null);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
 
   // Load profile data whenever the language changes
   useEffect(() => {
@@ -1345,11 +1407,14 @@ export default function App() {
     profiles[currentLang] = { xp: newXP, level: newLevelStr, completed: newCompleted };
     localStorage.setItem('langue_profiles', JSON.stringify(profiles));
 
-    let toastText = newLevelStr !== userLevel ? `Rank Up! You reached ${newLevelStr}` : `+${finalAmount} XP`;
-    if (isWeakest && newLevelStr === userLevel) toastText += " (x2 Weak Lang Bonus!)";
-
-    setShowXPToast({ amount: finalAmount, text: toastText });
-    setTimeout(() => setShowXPToast(null), 3000);
+    if (newLevelStr !== userLevel) {
+      setShowLevelUpModal(newLevelStr);
+    } else {
+      let toastText = `+${finalAmount} XP`;
+      if (isWeakest) toastText += " (x2 Weak Lang Bonus!)";
+      setShowXPToast({ amount: finalAmount, text: toastText });
+      setTimeout(() => setShowXPToast(null), 3000);
+    }
   };
 
   const getProgressProps = () => {
@@ -1474,7 +1539,7 @@ export default function App() {
                   padding: "4px 10px", display: "flex", alignItems: "center", gap: 8, color: "#fff", fontSize: 13, fontWeight: 600,
                   whiteSpace: "nowrap"
                 }}>
-                  <span style={{ fontSize: 16 }} title={`${userXP} total XP`}>⭐</span> {userLevel}
+                  <span style={{ fontSize: 16 }} title={`${userXP} total XP`}>{getRankBadge(userLevel)}</span> {userLevel}
                   <div style={{ width: 50, height: 6, background: "rgba(0,0,0,0.3)", borderRadius: 3, overflow: "hidden" }} title={`${userXP} / ${getProgressProps().currentObj.max === Infinity ? 'MAX' : getProgressProps().currentObj.max} XP`}>
                     <div style={{
                       width: `${getProgressProps().percentage}%`,
@@ -1620,11 +1685,33 @@ export default function App() {
         </div>
       )}
 
+      {/* Full Screen Digital Certificate Modal */}
+      {showLevelUpModal && (
+        <LevelUpModal
+          level={showLevelUpModal}
+          langName={name}
+          activeColor={activeColor}
+          onClose={() => setShowLevelUpModal(false)}
+        />
+      )}
+
       <style>
         {`
           @keyframes slideIn {
             from { transform: translateX(100px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes scaleUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+          }
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
           }
         `}
       </style>
