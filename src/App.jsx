@@ -206,7 +206,7 @@ function VocabularyTab({ data, gainXP }) {
           >
             {card.topic && <Badge color={card.topic}>{card.topic}</Badge>}
             <div className="flashcard-word" style={{ fontSize: 36, fontWeight: 700, marginTop: 16, textAlign: "center", transition: "all 0.2s" }}>
-              {flipped ? card.en : (card.it || card.es || card.he || card.kr)}
+              {flipped ? card.en : (card.it || card.es || card.he || card.kr || card.ru || card.fr || card.pt || card.en)}
             </div>
             {!flipped && card.rom && <div style={{ fontSize: 18, color: "#666", marginTop: 8 }}>{card.rom}</div>}
             {!flipped && <div style={{ marginTop: 12, fontSize: 13, color: "#999" }}>Click to reveal</div>}
@@ -238,7 +238,7 @@ function VocabularyTab({ data, gainXP }) {
       {mode === "multiple" && mcq && (
         <div>
           <div style={{ fontSize: 18, color: "#555", marginBottom: 8 }}>What does this mean?</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#222", marginBottom: 8 }}>{mcq.correct.it || mcq.correct.es || mcq.correct.he || mcq.correct.kr}</div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: "#222", marginBottom: 8 }}>{mcq.correct.it || mcq.correct.es || mcq.correct.he || mcq.correct.kr || mcq.correct.ru || mcq.correct.fr || mcq.correct.pt || mcq.correct.en}</div>
           {mcq.correct.rom && <div style={{ fontSize: 18, color: "#666", marginBottom: 8 }}>{mcq.correct.rom}</div>}
           {mcq.correct.topic && <Badge color={mcq.correct.topic}>{mcq.correct.topic}</Badge>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
