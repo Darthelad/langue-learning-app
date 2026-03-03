@@ -912,8 +912,9 @@ function PlacementTestTab({ data, gainXP }) {
       setListeningTarget(parsed);
     } catch (err) {
       console.error("Failed dictation generation:", err);
-      if (data.IDIOMS && data.IDIOMS.length > 0) {
-        const randomIdiom = data.IDIOMS[Math.floor(Math.random() * data.IDIOMS.length)];
+      const fallbackList = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
+      if (fallbackList.length > 0) {
+        const randomIdiom = fallbackList[Math.floor(Math.random() * fallbackList.length)];
         setListeningTarget({ native: randomIdiom.phrase, english: randomIdiom.meaning });
       } else {
         setListeningTarget({ native: "Error Loading Data", english: "Error" });
@@ -1170,10 +1171,13 @@ function SpeakingTab({ data, gainXP, activeColor }) {
         if (clean.startsWith("\`\`\`json")) clean = clean.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
         if (clean.startsWith("\`\`\`")) clean = clean.replace(/\`\`\`/g, "");
         const parsed = JSON.parse(clean);
-        setItems(parsed);
+        // Ensure parsing returned an array. If it returned { sentences: [...] }, handle it.
+        const parsedArray = Array.isArray(parsed) ? parsed : (parsed.sentences || parsed.items || [parsed]);
+        setItems(parsedArray);
       } catch (e) {
         console.error("Gemini failed, using fallback Idioms", e);
-        const fallback = (data.IDIOMS || []).map(i => ({ native: i.phrase, english: i.meaning }));
+        const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
+        const fallback = sourceIdioms.map(i => ({ native: i.phrase, english: i.meaning }));
         setItems(fallback);
       }
       setLoading(false);
