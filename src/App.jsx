@@ -871,6 +871,261 @@ function DashboardTab({ userXP, userLevel, completedItems, cefrThresholds, activ
   );
 }
 
+// ── PLACEMENT TEST TAB ────────────────────────────────────────────────────────
+function PlacementTestTab({ data, gainXP }) {
+  const [testState, setTestState] = useState("start"); // start -> listening -> reading -> results
+  const [score, setScore] = useState(0);
+
+  // Fisher-Yates array shuffle utility
+  const shuffle = (array) => {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  };
+
+  // Listening State
+  const [listeningTarget, setListeningTarget] = useState(null);
+  const [userInput, setUserInput] = useState("");
+  const [listeningChecked, setListeningChecked] = useState(false);
+  const [isDictationCorrect, setIsDictationCorrect] = useState(false);
+
+  // Reading State
+  const [readingLoading, setReadingLoading] = useState(false);
+  const [readingData, setReadingData] = useState(null);
+  const [readingAnswer, setReadingAnswer] = useState(null);
+  const [readingChecked, setReadingChecked] = useState(false);
+
+  const startTest = () => {
+    // Pick a random sentence for dictation
+    const sentencePool = data.SENTENCES || [];
+    if (sentencePool.length > 0) {
+      setListeningTarget(sentencePool[Math.floor(Math.random() * sentencePool.length)]);
+    }
+    setTestState("listening");
+    setScore(0);
+  };
+
+  const playAudio = (text) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      // Rough language mapping for audio
+      const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
+      utterance.lang = langMap[data.name] || "en-US";
+      utterance.rate = 0.85; // slightly slower for dictation
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("TTS not supported in this browser.");
+    }
+  };
+
+  const checkListening = () => {
+    if (!userInput.trim()) return;
+    // Strip punctuation to be lenient
+    const cleanTarget = listeningTarget.native.replace(/[.,!?¿¡]/g, '').toLowerCase().trim();
+    const cleanInput = userInput.replace(/[.,!?¿¡]/g, '').toLowerCase().trim();
+
+    const correct = cleanTarget === cleanInput;
+    setIsDictationCorrect(correct);
+    if (correct) setScore(s => s + 50); // High weight for dictation
+    setListeningChecked(true);
+  };
+
+  const generateReadingPrompt = async () => {
+    setTestState("reading");
+    setReadingLoading(true);
+
+    try {
+      const prompt = `Write a short 3-sentence story in ${data.name} suitable for a B1 language learner. Following the story, write 1 multiple choice reading comprehension question in English about the story. Provide 3 incorrect English options, and 1 correct English option. Format the response STRICTLY as a JSON object with this exact structure: { "story_native": "the story in ${data.name}", "story_english": "english translation", "question": "the question", "correct_option": "correct answer", "wrong_options": ["wrong1", "wrong2", "wrong3"] }`;
+
+      const response = await callGemini([{ role: "user", content: prompt }], "You are a CEFR language examiner. Output ONLY raw JSON. No markdown ticks.");
+      let cleanRes = response.trim();
+      if (cleanRes.startsWith("```json")) cleanRes = cleanRes.replace(/```json/g, "").replace(/```/g, "");
+
+      const parsed = JSON.parse(cleanRes);
+      // Shuffle options
+      const options = shuffle([parsed.correct_option, ...parsed.wrong_options]);
+      setReadingData({ ...parsed, options });
+    } catch (err) {
+      console.error("Failed test generation:", err);
+      // Fallback
+      setReadingData({
+        story_native: "An error occurred downloading the test data.",
+        story_english: "Please refresh and try again.",
+        question: "Did the test load?",
+        correct_option: "No",
+        wrong_options: ["Yes", "Maybe", "I don't know"],
+        options: ["No", "Yes", "Maybe", "I don't know"]
+      });
+    }
+    setReadingLoading(false);
+  };
+
+  const submitReading = (opt) => {
+    if (readingAnswer) return; // already answered
+    setReadingAnswer(opt);
+    setReadingChecked(true);
+    if (opt === readingData.correct_option) {
+      setScore(s => s + 50);
+    }
+  };
+
+  const finishTest = () => {
+    // Determine level placement based on Score (out of 100 max)
+    let assignedLevel = "A1";
+    let xpLumpSum = 1000;
+
+    if (score === 100) { assignedLevel = "B1"; xpLumpSum = 15000; }
+    else if (score === 50) { assignedLevel = "A2"; xpLumpSum = 5000; }
+
+    // Auto-Grant the lump sum XP to jump them exactly to that bracket
+    gainXP(xpLumpSum, `placement-test-${data.name}-${Date.now()}`);
+    setTestState("results");
+  };
+
+  if (testState === "start") {
+    return (
+      <div style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+        <div style={{ fontSize: "5rem", marginBottom: 20 }}>🎓</div>
+        <h2 style={{ fontSize: 32, fontWeight: 800, color: "#333", marginBottom: 20 }}>Placement Evaluation</h2>
+        <p style={{ fontSize: 18, color: "#666", maxWidth: 600, margin: "0 auto 30px", lineHeight: 1.6 }}>
+          Take a standardized dual-module exam to evaluate your proficiency in <strong>{data.name}</strong>.
+          Your performance will determine your initial CEFR Rank and award a lump-sum XP bonus.
+        </p>
+        <button onClick={startTest} style={btnStyle("#4ade80", "#fff")}>Begin Assessment →</button>
+      </div>
+    );
+  }
+
+  if (testState === "listening") {
+    return (
+      <div style={{ padding: "40px 20px", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+        <h3 style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 10, textAlign: "center" }}>Module 1: Listening Dictation</h3>
+        <p style={{ textAlign: "center", color: "#666", marginBottom: 30 }}>Click the speaker to hear a phrase in {data.name}. Type exactly what you hear.</p>
+
+        {listeningTarget ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20, maxWidth: 500, margin: "0 auto" }}>
+            <button
+              onClick={() => playAudio(listeningTarget.native)}
+              style={{ background: "#f0f4f8", border: "none", borderRadius: "50%", width: 80, height: 80, fontSize: 32, cursor: "pointer", transition: "all 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
+              onMouseLeave={e => e.currentTarget.style.background = "#f0f4f8"}
+            >
+              🔊
+            </button>
+
+            <input
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              disabled={listeningChecked}
+              placeholder="Type the phrase..."
+              autoComplete="off"
+              style={{ width: "100%", padding: "16px 20px", borderRadius: 16, border: "2px solid #e2e8f0", fontSize: 18, outline: "none", transition: "border-color 0.2s" }}
+              onFocus={e => e.currentTarget.style.borderColor = "#94a3b8"}
+              onBlur={e => e.currentTarget.style.borderColor = "#e2e8f0"}
+            />
+
+            {listeningChecked ? (
+              <div style={{ textAlign: "center", width: "100%", animation: "fadeIn 0.3s ease" }}>
+                <div style={{ padding: 16, borderRadius: 12, background: isDictationCorrect ? "#f0fdf4" : "#fef2f2", color: isDictationCorrect ? "#166534" : "#991b1b", fontWeight: 700, fontSize: 18, marginBottom: 10 }}>
+                  {isDictationCorrect ? "✓ Perfect match!" : "✗ Incorrect"}
+                </div>
+                {!isDictationCorrect && (
+                  <div style={{ color: "#666", fontSize: 15 }}>
+                    Correct answer: <strong>{listeningTarget.native}</strong>
+                  </div>
+                )}
+                <button onClick={generateReadingPrompt} style={{ ...btnStyle("#333", "#fff"), marginTop: 20, width: "100%" }}>Proceed to Module 2 →</button>
+              </div>
+            ) : (
+              <button onClick={checkListening} style={{ ...btnStyle("#4ade80", "#fff"), width: "100%" }} disabled={!userInput.trim()}>Submit Dictation</button>
+            )}
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", color: "#888" }}>Insufficient data for dictation test.</div>
+        )}
+      </div>
+    );
+  }
+
+  if (testState === "reading") {
+    return (
+      <div style={{ padding: "40px 20px", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", maxWidth: 700, margin: "0 auto" }}>
+        <h3 style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 10, textAlign: "center" }}>Module 2: Reading Comprehension</h3>
+
+        {readingLoading || !readingData ? (
+          <div style={{ textAlign: "center", padding: 40, color: "#888", fontSize: 18 }}>
+            <div style={{ fontSize: "3rem", marginBottom: 20, animation: "bounce 1s infinite" }}>⏳</div>
+            Generating AI story parameters...
+          </div>
+        ) : (
+          <div>
+            <div style={{ background: "#f8fafc", padding: 24, borderRadius: 16, borderLeft: "4px solid #94a3b8", marginBottom: 24 }}>
+              <p style={{ fontSize: 20, color: "#333", lineHeight: 1.6, margin: "0 0 10px 0", fontWeight: 600 }}>{readingData.story_native}</p>
+              {readingChecked && <p style={{ fontSize: 15, color: "#64748b", margin: 0, fontStyle: "italic" }}>Translation: {readingData.story_english}</p>}
+            </div>
+
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#1e293b", marginBottom: 16 }}>
+              {readingData.question}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {readingData.options.map((opt, i) => {
+                const isCorrect = opt === readingData.correct_option;
+                const isSelected = readingAnswer === opt;
+                let bg = "#fff", border = "2px solid #e2e8f0";
+
+                if (readingChecked) {
+                  if (isCorrect) { bg = "#f0fdf4"; border = "2px solid #22c55e"; }
+                  else if (isSelected && !isCorrect) { bg = "#fef2f2"; border = "2px solid #ef4444"; }
+                }
+
+                return (
+                  <button key={i} onClick={() => submitReading(opt)} disabled={readingChecked}
+                    style={{ padding: "16px 20px", borderRadius: 12, border, background: bg, textAlign: "left", fontSize: 16, cursor: readingChecked ? "default" : "pointer", transition: "all 0.2s" }}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+
+            {readingChecked && (
+              <button onClick={finishTest} style={{ ...btnStyle("#333", "#fff"), marginTop: 30, width: "100%" }}>Complete Assessment</button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (testState === "results") {
+    return (
+      <div style={{ padding: "50px 20px", textAlign: "center", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+        <div style={{ fontSize: "5rem", marginBottom: 20 }}>{score >= 50 ? "🎉" : "📚"}</div>
+        <h2 style={{ fontSize: 36, fontWeight: 800, color: "#333", marginBottom: 10 }}>Exam Complete</h2>
+        <p style={{ fontSize: 20, color: "#666", marginBottom: 30 }}>Final Score: <strong>{score}/100</strong></p>
+
+        <div style={{ background: "#f8fafc", padding: 24, borderRadius: 16, display: "inline-block", textAlign: "left", marginBottom: 30 }}>
+          <p style={{ margin: "0 0 10px 0", fontSize: 16, color: "#475569" }}>✓ Web Dictation: <strong style={{ color: isDictationCorrect ? "#166534" : "#991b1b" }}>{isDictationCorrect ? "Pass (50/50)" : "Fail (0/50)"}</strong></p>
+          <p style={{ margin: 0, fontSize: 16, color: "#475569" }}>✓ Reading Context: <strong style={{ color: readingAnswer === readingData?.correct_option ? "#166534" : "#991b1b" }}>{readingAnswer === readingData?.correct_option ? "Pass (50/50)" : "Fail (0/50)"}</strong></p>
+        </div>
+
+        <p style={{ fontSize: 18, color: "#333", marginBottom: 30 }}>
+          Based on these metrics, you have been placed directly into <strong>{score === 100 ? "B1" : score === 50 ? "A2" : "A1"}</strong> and granted the respective starting XP!
+        </p>
+
+        <button onClick={() => setTestState("start")} style={btnStyle("#94a3b8", "#fff")}>Retake Exam</button>
+      </div>
+    )
+  }
+
+  return null;
+}
+
 // ── POLYGLOT DASHBOARD ────────────────────────────────────────────────────────
 const getRankBadge = (level) => {
   switch (level) {
@@ -1201,7 +1456,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🇮🇹" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   korean: {
@@ -1221,7 +1477,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🎎" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   hebrew: {
@@ -1241,7 +1498,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🐪" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   spanish: {
@@ -1260,7 +1518,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🇪🇸" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   english: {
@@ -1279,7 +1538,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🇬🇧" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   russian: {
@@ -1298,7 +1558,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🇷🇺" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   portuguese: {
@@ -1317,7 +1578,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🇵🇹" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   },
   french: {
@@ -1336,7 +1598,8 @@ const LANGUAGES = {
       { id: "chat", label: "Conversation", icon: "💬" },
       { id: "idioms", label: "Phrases & Idioms", icon: "🇫🇷" },
       { id: "videos", label: "Videos", icon: "📺" },
-      { id: "culture", label: "Culture", icon: "🎭" }
+      { id: "culture", label: "Culture", icon: "🎭" },
+      { id: "placement", label: "Placement Test", icon: "🎓" }
     ]
   }
 };
@@ -1664,6 +1927,9 @@ export default function App() {
                 langCode={name === "Korean" ? "ko-KR" : "he-IL"}
                 gainXP={gainXP}
               />
+            )}
+            {activeTab === "placement" && (
+              <PlacementTestTab data={data} gainXP={gainXP} />
             )}
           </div>
         </>
