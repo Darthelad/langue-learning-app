@@ -801,6 +801,74 @@ function IdiomsTab({ data, gainXP }) {
   );
 }
 
+// ── DASHBOARD TAB ─────────────────────────────────────────────────────────────
+function DashboardTab({ userXP, userLevel, completedItems, cefrThresholds, activeColor }) {
+  const currentObj = cefrThresholds.find(t => userLevel === t.level) || cefrThresholds[0];
+  const range = currentObj.max === Infinity ? 1 : (currentObj.max - currentObj.min);
+  const progressIntoLevel = userXP - currentObj.min;
+  const percentage = currentObj.max === Infinity ? 100 : Math.min(100, (progressIntoLevel / range) * 100);
+
+  // Parse metrics
+  const keys = Object.keys(completedItems);
+  const flashcards = keys.filter(k => k.startsWith('vocab-flash')).length;
+  const mcqs = keys.filter(k => k.startsWith('vocab-mcq')).length;
+  const idioms = keys.filter(k => k.startsWith('idiom-')).length;
+  const grammar = keys.filter(k => k.startsWith('grammar-')).length;
+  const sentence = keys.filter(k => k.startsWith('sentence-')).length;
+  const chat = keys.filter(k => k.startsWith('chat-')).length;
+  const culture = keys.filter(k => k.startsWith('culture-')).length;
+  const alphabet = keys.filter(k => k.startsWith('alpha-')).length;
+
+  const MetricCard = ({ icon, label, val, color }) => (
+    <div style={{
+      background: "#fff", padding: "16px", borderRadius: 16, border: `1.5px solid ${color}33`,
+      display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+      boxShadow: "0 4px 12px rgba(0,0,0,0.03)", transition: "transform 0.2s"
+    }}
+      onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
+      onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+    >
+      <div style={{ fontSize: 28 }}>{icon}</div>
+      <div style={{ fontSize: 24, fontWeight: 800, color: "#333" }}>{val}</div>
+      <div style={{ fontSize: 13, color: "#777", fontWeight: 600, textTransform: "uppercase" }}>{label}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ padding: "20px 0" }}>
+      {/* Top Banner Rank */}
+      <div style={{
+        background: `linear-gradient(135deg, ${activeColor}dd 0%, ${activeColor} 100%)`,
+        borderRadius: 20, padding: 30, color: "#fff", textAlign: "center", marginBottom: 24,
+        boxShadow: `0 8px 24px ${activeColor}44`
+      }}>
+        <div style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: 1.5, opacity: 0.9, fontWeight: 700, marginBottom: 8 }}>Global Rank</div>
+        <div style={{ fontSize: 48, fontWeight: 800, marginBottom: 12 }}>{userLevel}</div>
+        <div style={{ background: "rgba(0,0,0,0.2)", borderRadius: 10, padding: 4, width: "100%", maxWidth: 300, margin: "0 auto", overflow: "hidden" }}>
+          <div style={{ background: "#4ade80", height: 12, borderRadius: 8, width: `${percentage}%`, transition: "width 1s ease-out" }} />
+        </div>
+        <div style={{ fontSize: 14, opacity: 0.9, marginTop: 12, fontWeight: 600 }}>
+          {userXP} / {currentObj.max === Infinity ? 'MAX' : currentObj.max} XP
+        </div>
+      </div>
+
+      <h3 style={{ fontSize: 20, fontWeight: 700, color: "#333", marginBottom: 16, paddingLeft: 8 }}>Learning Analytics</h3>
+
+      {/* Metrics Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 16 }}>
+        <MetricCard icon="🃏" label="Flashcards" val={flashcards} color={activeColor} />
+        <MetricCard icon="✅" label="Multiple Choice" val={mcqs} color={activeColor} />
+        <MetricCard icon="✏️" label="Grammar Quiz" val={grammar} color={activeColor} />
+        <MetricCard icon="🗣️" label="Idioms Learned" val={idioms} color={activeColor} />
+        <MetricCard icon="🔨" label="Sentences Built" val={sentence} color={activeColor} />
+        <MetricCard icon="💬" label="Chats Finished" val={chat} color={activeColor} />
+        <MetricCard icon="🎭" label="Culture Seen" val={culture} color={activeColor} />
+        <MetricCard icon="A" label="Alphabet Items" val={alphabet} color={activeColor} />
+      </div>
+    </div>
+  );
+}
+
 // ── BUTTON STYLE ──────────────────────────────────────────────────────────────
 function btnStyle(bg, color) {
   return {
@@ -824,7 +892,7 @@ function AlphabetTab({ alphabetData, langCode, gainXP }) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = langCode; // e.g., 'ko-KR', 'he-IL'
     window.speechSynthesis.speak(utterance);
-    gainXP(1, `alpha-${langCode}-${text}`);
+    gainXP(1, `alpha-${langCode}- ${text}`);
   };
 
   return (
@@ -899,24 +967,27 @@ function CultureTab({ data, gainXP }) {
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                onLoad={() => gainXP(5, `culture-${item.id}`)}
+                onLoad={() => gainXP(5, `culture-${item.id}`)
+                }
                 style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
-              ></iframe>
-            </div>
+              ></iframe >
+            </div >
             <div style={{ padding: 16, display: "flex", flexDirection: "column", flexGrow: 1 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#8b6914", textTransform: "uppercase", marginBottom: 6 }}>{item.category}</span>
               <h3 style={{ fontSize: 16, fontWeight: 600, color: "#333", margin: "0 0 8px 0", lineHeight: 1.4 }}>{item.title}</h3>
               <p style={{ margin: 0, fontSize: 13, color: "#777", marginTop: "auto" }}>{item.channel}</p>
             </div>
-          </div>
+          </div >
         ))}
-      </div>
-      {filtered.length === 0 && (
-        <div style={{ textAlign: "center", padding: 40, color: "#888" }}>
-          No content available for this category yet.
-        </div>
-      )}
-    </div>
+      </div >
+      {
+        filtered.length === 0 && (
+          <div style={{ textAlign: "center", padding: 40, color: "#888" }}>
+            No content available for this category yet.
+          </div>
+        )
+      }
+    </div >
   );
 }
 
@@ -1267,13 +1338,24 @@ export default function App() {
 
               {/* Home Button */}
               <button
-                onClick={() => setCurrentView("home")}
+                onClick={() => { setActiveTab("vocab"); setCurrentView("home"); }}
                 style={{
                   position: "absolute", top: -10, left: 0,
                   padding: "6px 14px", borderRadius: "20px", background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.4)", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 600, transition: "background 0.2s", display: "flex", alignItems: "center", gap: 6
                 }}
               >
                 <span>🏠</span> Home
+              </button>
+
+              {/* Dashboard Button */}
+              <button
+                onClick={() => setActiveTab("dashboard")}
+                style={{
+                  position: "absolute", top: -10, left: 100,
+                  padding: "6px 14px", borderRadius: "20px", background: activeTab === "dashboard" ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.4)", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 600, transition: "background 0.2s", display: "flex", alignItems: "center", gap: 6
+                }}
+              >
+                <span>📊</span> Dashboard
               </button>
 
               <div style={{ position: "absolute", top: -10, right: 0, display: "flex", gap: 10, alignItems: "center" }}>
@@ -1340,39 +1422,57 @@ export default function App() {
           </div>
 
           {/* Tabs */}
-          <div className="tabs-container" style={{ background: "#fff", borderBottom: "1px solid #e8d99f", overflowX: "auto", display: "flex" }}>
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                className="tab-btn"
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: "14px 16px",
-                  border: "none",
-                  borderBottom: activeTab === tab.id ? `3px solid ${activeColor}` : "3px solid transparent",
-                  background: "transparent",
-                  color: activeTab === tab.id ? activeColor : "#888",
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                  fontWeight: activeTab === tab.id ? 700 : 400,
-                  fontSize: 13,
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 4,
-                  minWidth: 80,
-                }}
-              >
-                <span className="tab-icon" style={{ fontSize: 18 }}>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
+          {activeTab !== "dashboard" && (
+            <div className="tabs-container" style={{ background: "#fff", borderBottom: "1px solid #e8d99f", overflowX: "auto", display: "flex" }}>
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className="tab-btn"
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    padding: "14px 16px",
+                    border: "none",
+                    borderBottom: activeTab === tab.id ? `3px solid ${activeColor}` : "3px solid transparent",
+                    background: "transparent",
+                    color: activeTab === tab.id ? activeColor : "#888",
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontWeight: activeTab === tab.id ? 700 : 400,
+                    fontSize: 13,
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                    minWidth: 80,
+                  }}
+                >
+                  <span className="tab-icon" style={{ fontSize: 18 }}>{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Content */}
           <div className="content-wrapper" style={{ maxWidth: 700, margin: "0 auto", padding: "0 20px 40px" }}>
+            {activeTab === "dashboard" && (
+              <DashboardTab
+                userXP={userXP}
+                userLevel={userLevel}
+                completedItems={completedItems}
+                cefrThresholds={[
+                  { level: "A1", min: 0, max: 1500 },
+                  { level: "A2", min: 1500, max: 4000 },
+                  { level: "B1", min: 4000, max: 8000 },
+                  { level: "B2", min: 8000, max: 15000 },
+                  { level: "C1", min: 15000, max: 30000 },
+                  { level: "C2", min: 30000, max: Infinity }
+                ]}
+                activeColor={activeColor}
+              />
+            )}
             {activeTab === "vocab" && <VocabularyTab data={data} gainXP={gainXP} />}
             {activeTab === "grammar" && <GrammarTab data={data} gainXP={gainXP} />}
             {activeTab === "builder" && (
