@@ -960,9 +960,12 @@ function PlacementTestTab({ data, gainXP }) {
 
   const checkListening = () => {
     if (!userInput.trim()) return;
-    // Strip punctuation to be lenient
-    const cleanTarget = listeningTarget.native.replace(/[.,!?¿¡]/g, '').toLowerCase().trim();
-    const cleanInput = userInput.replace(/[.,!?¿¡]/g, '').toLowerCase().trim();
+
+    // Clean string utility: Normalize, strip Hebrew Niqqud, and remove punctuation
+    const cleanStr = str => str.normalize("NFC").replace(/[\u0591-\u05C7]/g, '').replace(/[.,!?¿¡]/g, '').toLowerCase().trim();
+
+    const cleanTarget = cleanStr(listeningTarget.native);
+    const cleanInput = cleanStr(userInput);
 
     const correct = cleanTarget === cleanInput;
     setIsDictationCorrect(correct);
@@ -1267,8 +1270,8 @@ function SpeakingTab({ data, gainXP, activeColor }) {
     if (!transcript.trim()) return;
     const target = items[currentIndex].native;
 
-    // Clean string utility
-    const cleanStr = str => str.toLowerCase().replace(/[.,!?;¿¡]/g, '').trim();
+    // Clean string utility: Normalize, strip Hebrew Niqqud, and remove punctuation
+    const cleanStr = str => str.normalize("NFC").replace(/[\u0591-\u05C7]/g, '').replace(/[.,!?;¿¡]/g, '').toLowerCase().trim();
 
     const targetWords = cleanStr(target).split(/\s+/);
     const spokenWords = cleanStr(transcript).split(/\s+/);
