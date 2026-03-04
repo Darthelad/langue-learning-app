@@ -872,7 +872,7 @@ function DashboardTab({ userXP, userLevel, completedItems, cefrThresholds, activ
 }
 
 // ── PLACEMENT TEST TAB ────────────────────────────────────────────────────────
-function PlacementTestTab({ data, gainXP }) {
+function PlacementTestTab({ data, name, gainXP }) {
   const [testState, setTestState] = useState("start"); // start -> listening -> reading -> results
   const [score, setScore] = useState(0);
 
@@ -934,7 +934,7 @@ function PlacementTestTab({ data, gainXP }) {
 
       const utterance = new SpeechSynthesisUtterance(text);
       const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
-      const targetLang = langMap[data.name] || "en-US";
+      const targetLang = langMap[name] || "en-US";
       utterance.lang = targetLang;
       utterance.rate = 0.85;
 
@@ -1171,7 +1171,7 @@ function PlacementTestTab({ data, gainXP }) {
 }
 
 // ── SPEAKING TAB ──────────────────────────────────────────────────────────────
-function SpeakingTab({ data, gainXP, activeColor }) {
+function SpeakingTab({ data, name, gainXP, activeColor }) {
   const [items, setItems] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
@@ -1213,7 +1213,7 @@ function SpeakingTab({ data, gainXP, activeColor }) {
       const recog = new SpeechRecognition();
       recog.continuous = false;
       recog.interimResults = true;
-      recog.lang = langMap[data.name] || "en-US";
+      recog.lang = langMap[name] || "en-US";
 
       recog.onresult = (event) => {
         let currentTranscript = '';
@@ -1309,7 +1309,7 @@ function SpeakingTab({ data, gainXP, activeColor }) {
       if (window.speechSynthesis.pause) window.speechSynthesis.resume();
 
       const utterance = new SpeechSynthesisUtterance(targetText);
-      const targetLang = langMap[data.name] || "en-US";
+      const targetLang = langMap[name] || "en-US";
       utterance.lang = targetLang;
       utterance.rate = 0.85;
 
@@ -2299,10 +2299,10 @@ export default function App() {
               />
             )}
             {activeTab === "placement" && (
-              <PlacementTestTab data={data} gainXP={gainXP} />
+              <PlacementTestTab data={data} name={name} gainXP={gainXP} />
             )}
             {activeTab === "speaking" && (
-              <SpeakingTab data={data} gainXP={gainXP} activeColor={activeColor} />
+              <SpeakingTab data={data} name={name} gainXP={gainXP} activeColor={activeColor} />
             )}
           </div>
         </>
