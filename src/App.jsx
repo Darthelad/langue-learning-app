@@ -908,7 +908,7 @@ function PlacementTestTab({ data, gainXP }) {
     await new Promise(r => setTimeout(r, 500));
 
     try {
-      const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
+      const sourceIdioms = data.IDIOMS ? data.IDIOMS : [];
       if (sourceIdioms.length > 0) {
         const randomIdiom = sourceIdioms[Math.floor(Math.random() * sourceIdioms.length)];
         console.log("Using Dictation target:", randomIdiom);
@@ -1182,7 +1182,7 @@ function SpeakingTab({ data, gainXP, activeColor }) {
 
   // Library Support
   const [viewMode, setViewMode] = useState("practice"); // 'practice' or 'library'
-  const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
+  const sourceIdioms = data.IDIOMS ? data.IDIOMS : [];
 
   const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
 
