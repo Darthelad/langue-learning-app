@@ -933,11 +933,19 @@ function PlacementTestTab({ data, gainXP }) {
   const playAudio = (text) => {
     console.log("playAudio triggered with text:", text);
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Clear any stuck utterances
+      if (window.speechSynthesis.pause) window.speechSynthesis.resume();
+
       const utterance = new SpeechSynthesisUtterance(text);
-      // Rough language mapping for audio
       const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
-      utterance.lang = langMap[data.name] || "en-US";
-      utterance.rate = 0.85; // slightly slower for dictation
+      const targetLang = langMap[data.name] || "en-US";
+      utterance.lang = targetLang;
+      utterance.rate = 0.85;
+
+      // Explicitly pick a matching voice if Chrome doesn't automatically route it
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.includes(targetLang) || v.lang.includes(targetLang.split('-')[0]));
+      if (voice) utterance.voice = voice;
 
       utterance.onerror = (e) => console.error("SpeechSynthesis Error:", e);
       utterance.onstart = () => console.log("SpeechSynthesis Started");
@@ -1297,9 +1305,18 @@ function SpeakingTab({ data, gainXP, activeColor }) {
       const targetText = items[currentIndex]?.native;
       if (!targetText) return;
 
+      window.speechSynthesis.cancel(); // Clear any stuck utterances
+      if (window.speechSynthesis.pause) window.speechSynthesis.resume();
+
       const utterance = new SpeechSynthesisUtterance(targetText);
-      utterance.lang = langMap[data.name] || "en-US";
+      const targetLang = langMap[data.name] || "en-US";
+      utterance.lang = targetLang;
       utterance.rate = 0.85;
+
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.includes(targetLang) || v.lang.includes(targetLang.split('-')[0]));
+      if (voice) utterance.voice = voice;
+
       window.speechSynthesis.speak(utterance);
     } else {
       alert("Text-to-Speech is not supported in this browser.");
