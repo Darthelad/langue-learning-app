@@ -312,30 +312,39 @@ export const GRAMMAR_QUESTIONS = [
 ];
 
 export const IDIOMS = [
-    {
-        phrase: "식은 죽 먹기",
-        literal: "Eating cold porridge",
-        meaning: "A piece of cake, very easy to do.",
-        usage: "Use this when a task is incredibly simple.",
-        example: "그 시험은 식은 죽 먹기였어요.",
-        category: "Humor"
-    },
-    {
-        phrase: "눈이 높다",
-        literal: "Eyes are high",
-        meaning: "To have high standards (especially in dating or shopping).",
-        usage: "Used to describe someone who is very picky.",
-        example: "제 친구는 눈이 너무 높아서 아직 싱글이에요.",
-        category: "Character"
-    },
-    {
-        phrase: "귀가 얇다",
-        literal: "Ears are thin",
-        meaning: "Gullible, easily persuaded by others.",
-        usage: "Used for someone who believes whatever they hear.",
-        example: "그는 귀가 얇아서 사기를 당하기 쉬워요.",
-        category: "Personality & Mind"
-    }
+    {"phrase":"식은 죽 먹기","literal":"Eating cold porridge","meaning":"A piece of cake, very easy to do.","usage":"Use this when a task is incredibly simple.","example":"그 시험은 식은 죽 먹기였어요.","category":"Humor"},
+    {"phrase":"눈이 높다","literal":"Eyes are high","meaning":"To have high standards (especially in dating or shopping).","usage":"Used to describe someone who is very picky.","example":"제 친구는 눈이 너무 높아서 아직 싱글이에요.","category":"Character"},
+    {"phrase":"귀가 얇다","literal":"Ears are thin","meaning":"Gullible, easily persuaded by others.","usage":"Used for someone who believes whatever they hear.","example":"그는 귀가 얇아서 사기를 당하기 쉬워요.","category":"Personality & Mind"},
+    {"phrase":"안녕하세요, 어떻게 지내세요?","meaning":"Hello, how are you?","category":"Conversational"},
+    {"phrase":"저는 아주 잘 지내요, 감사합니다.","meaning":"I am doing great, thank you.","category":"Conversational"},
+    {"phrase":"이름이 뭐예요?","meaning":"What is your name?","category":"Conversational"},
+    {"phrase":"제 이름은... 입니다.","meaning":"My name is...","category":"Conversational"},
+    {"phrase":"만나서 반갑습니다.","meaning":"Nice to meet you.","category":"Conversational"},
+    {"phrase":"어디에서 왔어요?","meaning":"Where are you from?","category":"Conversational"},
+    {"phrase":"저는 ...에서 왔어요.","meaning":"I am from...","category":"Conversational"},
+    {"phrase":"영어를 할 수 있어요?","meaning":"Do you speak English?","category":"Conversational"},
+    {"phrase":"조금 할 수 있어요.","meaning":"I speak a little bit.","category":"Conversational"},
+    {"phrase":"모르겠어요.","meaning":"I don't understand.","category":"Conversational"},
+    {"phrase":"좀 더 천천히 말해 주시겠어요?","meaning":"Can you speak more slowly, please?","category":"Conversational"},
+    {"phrase":"다시 한 번 말해 줄래요?","meaning":"Can you repeat that?","category":"Conversational"},
+    {"phrase":"실례합니다, 화장실이 어디에 있어요?","meaning":"Excuse me, where is the bathroom?","category":"Conversational"},
+    {"phrase":"이거 얼마예요?","meaning":"How much does this cost?","category":"Conversational"},
+    {"phrase":"주문하고 싶어요.","meaning":"I would like to order.","category":"Conversational"},
+    {"phrase":"계산해 주세요.","meaning":"The check, please.","category":"Conversational"},
+    {"phrase":"신용카드로 계산할 수 있나요?","meaning":"Can I pay with a credit card?","category":"Conversational"},
+    {"phrase":"몇 시예요?","meaning":"What time is it?","category":"Conversational"},
+    {"phrase":"도움이 필요해요.","meaning":"I need some help, please.","category":"Conversational"},
+    {"phrase":"길을 잃었어요.","meaning":"I am lost.","category":"Conversational"},
+    {"phrase":"좋은 하루 보내세요!","meaning":"Have a great day!","category":"Conversational"},
+    {"phrase":"저는 언어 배우는 것을 좋아해요.","meaning":"I love learning languages.","category":"Conversational"},
+    {"phrase":"이번 주말에 뭐 해요?","meaning":"What are you doing this weekend?","category":"Conversational"},
+    {"phrase":"조금 피곤해요.","meaning":"I am feeling a bit tired.","category":"Conversational"},
+    {"phrase":"배고파요?","meaning":"Are you hungry?","category":"Conversational"},
+    {"phrase":"이거 정말 맛있네요.","meaning":"This is very delicious.","category":"Conversational"},
+    {"phrase":"나중에 전화할게요.","meaning":"I will call you later.","category":"Conversational"},
+    {"phrase":"가장 좋아하는 음식이 뭐예요?","meaning":"What is your favorite food?","category":"Conversational"},
+    {"phrase":"오늘 날씨가 어때요?","meaning":"How is the weather today?","category":"Conversational"},
+    {"phrase":"미안해요, 늦었어요.","meaning":"I am sorry, I am late.","category":"Conversational"}
 ];
 
 export const SENTENCE_BUILD_PROMPTS = [

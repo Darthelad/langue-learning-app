@@ -157,86 +157,46 @@ export const GRAMMAR_QUESTIONS = [
     }
 ];
 export const IDIOMS = [
-    {
-        phrase: "Pão, pão, queijo, queijo",
-        literal: "Bread, bread, cheese, cheese",
-        meaning: "To call a spade a spade / to tell it like it is",
-        usage: "Used when speaking plainly and directly.",
-        example: "Comigo é assim: pão, pão, queijo, queijo.",
-        category: "Communication"
-    },
-    {
-        phrase: "Falar pelos cotovelos",
-        literal: "To speak through the elbows",
-        meaning: "To talk someone's ear off / to talk too much",
-        usage: "When someone is constantly talking without stopping.",
-        example: "A vizinha fala pelos cotovelos!",
-        category: "Social Life"
-    },
-    {
-        phrase: "Chorar sobre o leite derramado",
-        literal: "To cry over spilled milk",
-        meaning: "To cry over spilled milk",
-        usage: "Used to say there's no point in being sad over something that can't be undone.",
-        example: "Não adianta chorar sobre o leite derramado, vamos focar no futuro.",
-        category: "Emotions"
-    },
-    {
-        phrase: "Dar com os burros n'água",
-        literal: "To give with the donkeys in the water",
-        meaning: "To fail spectacularly / to hit a dead end",
-        usage: "When a plan goes wrong.",
-        example: "Ele tentou enganar o chefe, mas deu com os burros n'água.",
-        category: "Frustration"
-    },
-    {
-        phrase: "Custar os olhos da cara",
-        literal: "To cost the eyes of the face",
-        meaning: "To cost an arm and a leg",
-        usage: "To complain about a very high price.",
-        example: "Esse computador novo custou os olhos da cara.",
-        category: "Money"
-    },
-    {
-        phrase: "Procurar chifre em cabeça de cavalo",
-        literal: "To look for a horn on a horse's head",
-        meaning: "To look for problems where there are none / overcomplicate",
-        usage: "When someone is being overly suspicious or paranoid.",
-        example: "Você está procurando chifre em cabeça de cavalo, não há conspiração nenhuma.",
-        category: "Personality & Mind"
-    },
-    {
-        phrase: "Estar com a pulga atrás da orelha",
-        literal: "To be with the flea behind the ear",
-        meaning: "To be suspicious / to smell a rat",
-        usage: "When you suspect something is wrong.",
-        example: "Fiquei com a pulga atrás da orelha depois dessa ligação.",
-        category: "Emotions"
-    },
-    {
-        phrase: "Lavar as mãos",
-        literal: "To wash the hands",
-        meaning: "To wash one's hands of the matter",
-        usage: "To abdicate responsibility for a situation.",
-        example: "Eu avisei que daria errado. Agora, eu lavo as minhas mãos.",
-        category: "Work & Business"
-    },
-    {
-        phrase: "Chutar o balde",
-        literal: "To kick the bucket",
-        meaning: "To lose one's temper / give up completely",
-        usage: "Note: Unlike in English, this does NOT mean 'to die'. It means to throw a fit or abandon a task in frustration.",
-        example: "Fiquei tão irritado com o projeto que quase chutei o balde.",
-        category: "Anger"
-    },
-    {
-        phrase: "Bater as botas",
-        literal: "To hit the boots",
-        meaning: "To kick the bucket / to die",
-        usage: "A colloquial, slightly irreverent way to say someone died.",
-        example: "Infelizmente, o cachorro do vizinho bateu as botas.",
-        category: "Food & Daily Life"
-    }
+    {"phrase":"Pão, pão, queijo, queijo","literal":"Bread, bread, cheese, cheese","meaning":"To call a spade a spade / to tell it like it is","usage":"Used when speaking plainly and directly.","example":"Comigo é assim: pão, pão, queijo, queijo.","category":"Communication"},
+    {"phrase":"Falar pelos cotovelos","literal":"To speak through the elbows","meaning":"To talk someone's ear off / to talk too much","usage":"When someone is constantly talking without stopping.","example":"A vizinha fala pelos cotovelos!","category":"Social Life"},
+    {"phrase":"Chorar sobre o leite derramado","literal":"To cry over spilled milk","meaning":"To cry over spilled milk","usage":"Used to say there's no point in being sad over something that can't be undone.","example":"Não adianta chorar sobre o leite derramado, vamos focar no futuro.","category":"Emotions"},
+    {"phrase":"Dar com os burros n'água","literal":"To give with the donkeys in the water","meaning":"To fail spectacularly / to hit a dead end","usage":"When a plan goes wrong.","example":"Ele tentou enganar o chefe, mas deu com os burros n'água.","category":"Frustration"},
+    {"phrase":"Custar os olhos da cara","literal":"To cost the eyes of the face","meaning":"To cost an arm and a leg","usage":"To complain about a very high price.","example":"Esse computador novo custou os olhos da cara.","category":"Money"},
+    {"phrase":"Procurar chifre em cabeça de cavalo","literal":"To look for a horn on a horse's head","meaning":"To look for problems where there are none / overcomplicate","usage":"When someone is being overly suspicious or paranoid.","example":"Você está procurando chifre em cabeça de cavalo, não há conspiração nenhuma.","category":"Personality & Mind"},
+    {"phrase":"Estar com a pulga atrás da orelha","literal":"To be with the flea behind the ear","meaning":"To be suspicious / to smell a rat","usage":"When you suspect something is wrong.","example":"Fiquei com a pulga atrás da orelha depois dessa ligação.","category":"Emotions"},
+    {"phrase":"Lavar as mãos","literal":"To wash the hands","meaning":"To wash one's hands of the matter","usage":"To abdicate responsibility for a situation.","example":"Eu avisei que daria errado. Agora, eu lavo as minhas mãos.","category":"Work & Business"},
+    {"phrase":"Chutar o balde","literal":"To kick the bucket","meaning":"To lose one's temper / give up completely","usage":"Note: Unlike in English, this does NOT mean 'to die'. It means to throw a fit or abandon a task in frustration.","example":"Fiquei tão irritado com o projeto que quase chutei o balde.","category":"Anger"},
+    {"phrase":"Bater as botas","literal":"To hit the boots","meaning":"To kick the bucket / to die","usage":"A colloquial, slightly irreverent way to say someone died.","example":"Infelizmente, o cachorro do vizinho bateu as botas.","category":"Food & Daily Life"},
+    {"phrase":"Olá, como você está?","meaning":"Hello, how are you?","category":"Conversational"},
+    {"phrase":"Estou ótimo, obrigado.","meaning":"I am doing great, thank you.","category":"Conversational"},
+    {"phrase":"Como você se chama?","meaning":"What is your name?","category":"Conversational"},
+    {"phrase":"Meu nome é...","meaning":"My name is...","category":"Conversational"},
+    {"phrase":"Prazer em conhecer você.","meaning":"Nice to meet you.","category":"Conversational"},
+    {"phrase":"De onde você é?","meaning":"Where are you from?","category":"Conversational"},
+    {"phrase":"Eu sou de...","meaning":"I am from...","category":"Conversational"},
+    {"phrase":"Você fala inglês?","meaning":"Do you speak English?","category":"Conversational"},
+    {"phrase":"Eu falo um pouco.","meaning":"I speak a little bit.","category":"Conversational"},
+    {"phrase":"Não entendo.","meaning":"I don't understand.","category":"Conversational"},
+    {"phrase":"Você pode falar mais devagar, por favor?","meaning":"Can you speak more slowly, please?","category":"Conversational"},
+    {"phrase":"Você pode repetir isso?","meaning":"Can you repeat that?","category":"Conversational"},
+    {"phrase":"Com licença, onde fica o banheiro?","meaning":"Excuse me, where is the bathroom?","category":"Conversational"},
+    {"phrase":"Quanto custa isso?","meaning":"How much does this cost?","category":"Conversational"},
+    {"phrase":"Eu gostaria de fazer o pedido.","meaning":"I would like to order.","category":"Conversational"},
+    {"phrase":"A conta, por favor.","meaning":"The check, please.","category":"Conversational"},
+    {"phrase":"Posso pagar com cartão de crédito?","meaning":"Can I pay with a credit card?","category":"Conversational"},
+    {"phrase":"Que horas são?","meaning":"What time is it?","category":"Conversational"},
+    {"phrase":"Preciso de ajuda, por favor.","meaning":"I need some help, please.","category":"Conversational"},
+    {"phrase":"Estou perdido.","meaning":"I am lost.","category":"Conversational"},
+    {"phrase":"Tenha um ótimo dia!","meaning":"Have a great day!","category":"Conversational"},
+    {"phrase":"Eu amo aprender idiomas.","meaning":"I love learning languages.","category":"Conversational"},
+    {"phrase":"O que você vai fazer neste fim de semana?","meaning":"What are you doing this weekend?","category":"Conversational"},
+    {"phrase":"Estou me sentindo um pouco cansado.","meaning":"I am feeling a bit tired.","category":"Conversational"},
+    {"phrase":"Você está com fome?","meaning":"Are you hungry?","category":"Conversational"},
+    {"phrase":"Isso é muito gostoso.","meaning":"This is very delicious.","category":"Conversational"},
+    {"phrase":"Eu te ligo mais tarde.","meaning":"I will call you later.","category":"Conversational"},
+    {"phrase":"Qual é a sua comida favorita?","meaning":"What is your favorite food?","category":"Conversational"},
+    {"phrase":"Como está o tempo hoje?","meaning":"How is the weather today?","category":"Conversational"},
+    {"phrase":"Desculpe, estou atrasado.","meaning":"I am sorry, I am late.","category":"Conversational"}
 ];
 export const CONVERSATION_TOPICS = [
     "Teus passatempos (Your hobbies)",

@@ -208,7 +208,38 @@ export const GRAMMAR_QUESTIONS = [
         explanation: "In English, the indefinite article 'an' is used before words that begin with a vowel sound to make pronunciation smoother."
     }
 ];
-export const IDIOMS = [];
+export const IDIOMS = [
+    {"phrase":"Hello, how are you?","meaning":"Hello, how are you?","category":"Conversational"},
+    {"phrase":"I am doing great, thank you.","meaning":"I am doing great, thank you.","category":"Conversational"},
+    {"phrase":"What is your name?","meaning":"What is your name?","category":"Conversational"},
+    {"phrase":"My name is...","meaning":"My name is...","category":"Conversational"},
+    {"phrase":"Nice to meet you.","meaning":"Nice to meet you.","category":"Conversational"},
+    {"phrase":"Where are you from?","meaning":"Where are you from?","category":"Conversational"},
+    {"phrase":"I am from...","meaning":"I am from...","category":"Conversational"},
+    {"phrase":"Do you speak English?","meaning":"Do you speak English?","category":"Conversational"},
+    {"phrase":"I speak a little bit.","meaning":"I speak a little bit.","category":"Conversational"},
+    {"phrase":"I don't understand.","meaning":"I don't understand.","category":"Conversational"},
+    {"phrase":"Can you speak more slowly, please?","meaning":"Can you speak more slowly, please?","category":"Conversational"},
+    {"phrase":"Can you repeat that?","meaning":"Can you repeat that?","category":"Conversational"},
+    {"phrase":"Excuse me, where is the bathroom?","meaning":"Excuse me, where is the bathroom?","category":"Conversational"},
+    {"phrase":"How much does this cost?","meaning":"How much does this cost?","category":"Conversational"},
+    {"phrase":"I would like to order.","meaning":"I would like to order.","category":"Conversational"},
+    {"phrase":"The check, please.","meaning":"The check, please.","category":"Conversational"},
+    {"phrase":"Can I pay with a credit card?","meaning":"Can I pay with a credit card?","category":"Conversational"},
+    {"phrase":"What time is it?","meaning":"What time is it?","category":"Conversational"},
+    {"phrase":"I need some help, please.","meaning":"I need some help, please.","category":"Conversational"},
+    {"phrase":"I am lost.","meaning":"I am lost.","category":"Conversational"},
+    {"phrase":"Have a great day!","meaning":"Have a great day!","category":"Conversational"},
+    {"phrase":"I love learning languages.","meaning":"I love learning languages.","category":"Conversational"},
+    {"phrase":"What are you doing this weekend?","meaning":"What are you doing this weekend?","category":"Conversational"},
+    {"phrase":"I am feeling a bit tired.","meaning":"I am feeling a bit tired.","category":"Conversational"},
+    {"phrase":"Are you hungry?","meaning":"Are you hungry?","category":"Conversational"},
+    {"phrase":"This is very delicious.","meaning":"This is very delicious.","category":"Conversational"},
+    {"phrase":"I will call you later.","meaning":"I will call you later.","category":"Conversational"},
+    {"phrase":"What is your favorite food?","meaning":"What is your favorite food?","category":"Conversational"},
+    {"phrase":"How is the weather today?","meaning":"How is the weather today?","category":"Conversational"},
+    {"phrase":"I am sorry, I am late.","meaning":"I am sorry, I am late.","category":"Conversational"}
+];
 export const CONVERSATION_TOPICS = [
     "Your favorite travel destinations",
     "The best food you've ever eaten",

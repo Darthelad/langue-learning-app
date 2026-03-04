@@ -209,87 +209,46 @@ export const GRAMMAR_QUESTIONS = [
     }
 ];
 export const IDIOMS = [
-    {
-        phrase: "Делать из мухи слона",
-        literal: "To make an elephant out of a fly",
-        meaning: "To make a mountain out of a molehill / to exaggerate",
-        usage: "Use this when someone is overreacting to a small problem.",
-        example: "Не делай из мухи слона, это всего лишь царапина!",
-        category: "Frustration"
-    },
-    {
-        phrase: "Водить за нос",
-        literal: "To lead by the nose",
-        meaning: "To deceive or trick someone",
-        usage: "Used when someone is stringing you along with false promises.",
-        example: "Он меня уже месяц водит за нос с этими деньгами.",
-        category: "Social Life"
-    },
-    {
-        phrase: "Без сучка, без задоринки",
-        literal: "Without a knot, without a snag",
-        meaning: "Without a hitch / perfectly smoothly",
-        usage: "To describe an event or plan that goes perfectly.",
-        example: "Концерт прошел без сучка, без задоринки.",
-        category: "Work & Business"
-    },
-    {
-        phrase: "Как две капли воды",
-        literal: "Like two drops of water",
-        meaning: "Like two peas in a pod / exactly alike",
-        usage: "To describe two people or things that look identical.",
-        example: "Братья похожи как две капли воды.",
-        category: "People & Family"
-    },
-    {
-        phrase: "Витать в облаках",
-        literal: "To hover in the clouds",
-        meaning: "To have one's head in the clouds / be daydreaming",
-        usage: "To describe someone not paying attention.",
-        example: "На уроке он постоянно витает в облаках.",
-        category: "Personality & Mind"
-    },
-    {
-        phrase: "Ни пуха ни пера!",
-        literal: "Neither down nor feather!",
-        meaning: "Break a leg! / Good luck!",
-        usage: "Said to someone before an exam or big performance.",
-        response: "К чёрту! (To the devil!)",
-        example: "Завтра экзамен. Ни пуха ни пера!",
-        category: "Opportunity"
-    },
-    {
-        phrase: "Бить баклуши",
-        literal: "To beat wooden blocks",
-        meaning: "To twiddle one's thumbs / to slack off",
-        usage: "To complain about someone who is lazy or avoiding work.",
-        example: "Хватит бить баклуши, пора работать!",
-        category: "Work & Business"
-    },
-    {
-        phrase: "Заморить червячка",
-        literal: "To starve the little worm",
-        meaning: "To take the edge off one's hunger / grab a bite",
-        usage: "Said when you want to eat a small snack before a main meal.",
-        example: "Давай заморим червячка перед ужином.",
-        category: "Food & Daily Life"
-    },
-    {
-        phrase: "Когда рак на горе свистнет",
-        literal: "When the crayfish whistles on the mountain",
-        meaning: "When pigs fly / never",
-        usage: "To express that something will never happen.",
-        example: "Он вернет долг, только когда рак на горе свистнет.",
-        category: "Social Life"
-    },
-    {
-        phrase: "Вешать лапшу на уши",
-        literal: "To hang noodles on the ears",
-        meaning: "To tell tall tales / to lie or deceive",
-        usage: "To accuse someone of blatantly lying to you.",
-        example: "Хватит вешать мне лапшу на уши, я знаю правду!",
-        category: "Communication"
-    }
+    {"phrase":"Делать из мухи слона","literal":"To make an elephant out of a fly","meaning":"To make a mountain out of a molehill / to exaggerate","usage":"Use this when someone is overreacting to a small problem.","example":"Не делай из мухи слона, это всего лишь царапина!","category":"Frustration"},
+    {"phrase":"Водить за нос","literal":"To lead by the nose","meaning":"To deceive or trick someone","usage":"Used when someone is stringing you along with false promises.","example":"Он меня уже месяц водит за нос с этими деньгами.","category":"Social Life"},
+    {"phrase":"Без сучка, без задоринки","literal":"Without a knot, without a snag","meaning":"Without a hitch / perfectly smoothly","usage":"To describe an event or plan that goes perfectly.","example":"Концерт прошел без сучка, без задоринки.","category":"Work & Business"},
+    {"phrase":"Как две капли воды","literal":"Like two drops of water","meaning":"Like two peas in a pod / exactly alike","usage":"To describe two people or things that look identical.","example":"Братья похожи как две капли воды.","category":"People & Family"},
+    {"phrase":"Витать в облаках","literal":"To hover in the clouds","meaning":"To have one's head in the clouds / be daydreaming","usage":"To describe someone not paying attention.","example":"На уроке он постоянно витает в облаках.","category":"Personality & Mind"},
+    {"phrase":"Ни пуха ни пера!","literal":"Neither down nor feather!","meaning":"Break a leg! / Good luck!","usage":"Said to someone before an exam or big performance.","response":"К чёрту! (To the devil!)","example":"Завтра экзамен. Ни пуха ни пера!","category":"Opportunity"},
+    {"phrase":"Бить баклуши","literal":"To beat wooden blocks","meaning":"To twiddle one's thumbs / to slack off","usage":"To complain about someone who is lazy or avoiding work.","example":"Хватит бить баклуши, пора работать!","category":"Work & Business"},
+    {"phrase":"Заморить червячка","literal":"To starve the little worm","meaning":"To take the edge off one's hunger / grab a bite","usage":"Said when you want to eat a small snack before a main meal.","example":"Давай заморим червячка перед ужином.","category":"Food & Daily Life"},
+    {"phrase":"Когда рак на горе свистнет","literal":"When the crayfish whistles on the mountain","meaning":"When pigs fly / never","usage":"To express that something will never happen.","example":"Он вернет долг, только когда рак на горе свистнет.","category":"Social Life"},
+    {"phrase":"Вешать лапшу на уши","literal":"To hang noodles on the ears","meaning":"To tell tall tales / to lie or deceive","usage":"To accuse someone of blatantly lying to you.","example":"Хватит вешать мне лапшу на уши, я знаю правду!","category":"Communication"},
+    {"phrase":"Привет, как дела?","meaning":"Hello, how are you?","category":"Conversational"},
+    {"phrase":"У меня всё отлично, спасибо.","meaning":"I am doing great, thank you.","category":"Conversational"},
+    {"phrase":"Как тебя зовут?","meaning":"What is your name?","category":"Conversational"},
+    {"phrase":"Меня зовут...","meaning":"My name is...","category":"Conversational"},
+    {"phrase":"Приятно познакомиться.","meaning":"Nice to meet you.","category":"Conversational"},
+    {"phrase":"Откуда ты?","meaning":"Where are you from?","category":"Conversational"},
+    {"phrase":"Я из...","meaning":"I am from...","category":"Conversational"},
+    {"phrase":"Ты говоришь по-английски?","meaning":"Do you speak English?","category":"Conversational"},
+    {"phrase":"Я немного говорю.","meaning":"I speak a little bit.","category":"Conversational"},
+    {"phrase":"Я не понимаю.","meaning":"I don't understand.","category":"Conversational"},
+    {"phrase":"Не мог бы ты говорить медленнее, пожалуйста?","meaning":"Can you speak more slowly, please?","category":"Conversational"},
+    {"phrase":"Не мог бы ты повторить?","meaning":"Can you repeat that?","category":"Conversational"},
+    {"phrase":"Извините, где туалет?","meaning":"Excuse me, where is the bathroom?","category":"Conversational"},
+    {"phrase":"Сколько это стоит?","meaning":"How much does this cost?","category":"Conversational"},
+    {"phrase":"Я бы хотел сделать заказ.","meaning":"I would like to order.","category":"Conversational"},
+    {"phrase":"Счёт, пожалуйста.","meaning":"The check, please.","category":"Conversational"},
+    {"phrase":"Могу я оплатить кредитной картой?","meaning":"Can I pay with a credit card?","category":"Conversational"},
+    {"phrase":"Который час?","meaning":"What time is it?","category":"Conversational"},
+    {"phrase":"Мне нужна помощь, пожалуйста.","meaning":"I need some help, please.","category":"Conversational"},
+    {"phrase":"Я заблудился.","meaning":"I am lost.","category":"Conversational"},
+    {"phrase":"Хорошего дня!","meaning":"Have a great day!","category":"Conversational"},
+    {"phrase":"Я люблю изучать языки.","meaning":"I love learning languages.","category":"Conversational"},
+    {"phrase":"Что ты делаешь в эти выходные?","meaning":"What are you doing this weekend?","category":"Conversational"},
+    {"phrase":"Я чувствую себя немного уставшим.","meaning":"I am feeling a bit tired.","category":"Conversational"},
+    {"phrase":"Ты голоден?","meaning":"Are you hungry?","category":"Conversational"},
+    {"phrase":"Это очень вкусно.","meaning":"This is very delicious.","category":"Conversational"},
+    {"phrase":"Я позвоню тебе позже.","meaning":"I will call you later.","category":"Conversational"},
+    {"phrase":"Какая твоя любимая еда?","meaning":"What is your favorite food?","category":"Conversational"},
+    {"phrase":"Какая сегодня погода?","meaning":"How is the weather today?","category":"Conversational"},
+    {"phrase":"Извини, я опоздал.","meaning":"I am sorry, I am late.","category":"Conversational"}
 ];
 export const CONVERSATION_TOPICS = [
     "Твои увлечения и хобби (Your hobbies and interests)",

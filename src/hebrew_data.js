@@ -461,30 +461,39 @@ export const GRAMMAR_QUESTIONS = [
 ];
 
 export const IDIOMS = [
-    {
-        phrase: "על הפנים",
-        literal: "On the face",
-        meaning: "Terrible, awful, feeling very bad.",
-        usage: "Used to describe a bad situation or feeling sick.",
-        example: "איך היה המבחן? - על הפנים.",
-        category: "Emotions"
-    },
-    {
-        phrase: "חבל על הזמן",
-        literal: "Pity on the time",
-        meaning: "Amazing, fantastic (slang context).",
-        usage: "Ironically, in modern slang, it means something is incredibly good (so good it's a waste of time to describe it).",
-        example: "המסעדה הזאת פשוט חבל על הזמן!",
-        category: "Slang"
-    },
-    {
-        phrase: "חי בסרט",
-        literal: "Lives in a movie",
-        meaning: "Delusional, unrealistic.",
-        usage: "Said about someone who is completely out of touch with reality.",
-        example: "הוא חושב שהוא יתעשר מחר. ממש חי בסרט.",
-        category: "Character"
-    }
+    {"phrase":"על הפנים","literal":"On the face","meaning":"Terrible, awful, feeling very bad.","usage":"Used to describe a bad situation or feeling sick.","example":"איך היה המבחן? - על הפנים.","category":"Emotions"},
+    {"phrase":"חבל על הזמן","literal":"Pity on the time","meaning":"Amazing, fantastic (slang context).","usage":"Ironically, in modern slang, it means something is incredibly good (so good it's a waste of time to describe it).","example":"המסעדה הזאת פשוט חבל על הזמן!","category":"Slang"},
+    {"phrase":"חי בסרט","literal":"Lives in a movie","meaning":"Delusional, unrealistic.","usage":"Said about someone who is completely out of touch with reality.","example":"הוא חושב שהוא יתעשר מחר. ממש חי בסרט.","category":"Character"},
+    {"phrase":"שלום, מה שלומך?","meaning":"Hello, how are you?","category":"Conversational"},
+    {"phrase":"אני בסדר גמור, תודה.","meaning":"I am doing great, thank you.","category":"Conversational"},
+    {"phrase":"איך קוראים לך?","meaning":"What is your name?","category":"Conversational"},
+    {"phrase":"קוראים לי...","meaning":"My name is...","category":"Conversational"},
+    {"phrase":"נעים מאוד.","meaning":"Nice to meet you.","category":"Conversational"},
+    {"phrase":"מאיפה אתה?","meaning":"Where are you from?","category":"Conversational"},
+    {"phrase":"אני מ...","meaning":"I am from...","category":"Conversational"},
+    {"phrase":"אתה מדבר אנגלית?","meaning":"Do you speak English?","category":"Conversational"},
+    {"phrase":"אני מדבר קצת.","meaning":"I speak a little bit.","category":"Conversational"},
+    {"phrase":"אני לא מבין.","meaning":"I don't understand.","category":"Conversational"},
+    {"phrase":"אתה יכול לדבר יותר לאט, בבקשה?","meaning":"Can you speak more slowly, please?","category":"Conversational"},
+    {"phrase":"אתה יכול לחזור על זה?","meaning":"Can you repeat that?","category":"Conversational"},
+    {"phrase":"סליחה, איפה השירותים?","meaning":"Excuse me, where is the bathroom?","category":"Conversational"},
+    {"phrase":"כמה זה עולה?","meaning":"How much does this cost?","category":"Conversational"},
+    {"phrase":"אני רוצה להזמין.","meaning":"I would like to order.","category":"Conversational"},
+    {"phrase":"חשבון, בבקשה.","meaning":"The check, please.","category":"Conversational"},
+    {"phrase":"אפשר לשלם בכרטיס אשראי?","meaning":"Can I pay with a credit card?","category":"Conversational"},
+    {"phrase":"מה השעה?","meaning":"What time is it?","category":"Conversational"},
+    {"phrase":"אני צריך עזרה, בבקשה.","meaning":"I need some help, please.","category":"Conversational"},
+    {"phrase":"הלכתי לאיבוד.","meaning":"I am lost.","category":"Conversational"},
+    {"phrase":"שיהיה לך יום טוב!","meaning":"Have a great day!","category":"Conversational"},
+    {"phrase":"אני אוהב ללמוד שפות.","meaning":"I love learning languages.","category":"Conversational"},
+    {"phrase":"מה אתה עושה בסוף השבוע?","meaning":"What are you doing this weekend?","category":"Conversational"},
+    {"phrase":"אני מרגיש קצת עייף.","meaning":"I am feeling a bit tired.","category":"Conversational"},
+    {"phrase":"אתה רעב?","meaning":"Are you hungry?","category":"Conversational"},
+    {"phrase":"זה מאוד טעים.","meaning":"This is very delicious.","category":"Conversational"},
+    {"phrase":"אני אתקשר אליך מאוחר יותר.","meaning":"I will call you later.","category":"Conversational"},
+    {"phrase":"מה האוכל האהוב עליך?","meaning":"What is your favorite food?","category":"Conversational"},
+    {"phrase":"איך מזג האוויר היום?","meaning":"How is the weather today?","category":"Conversational"},
+    {"phrase":"סליחה, אני מאחר.","meaning":"I am sorry, I am late.","category":"Conversational"}
 ];
 
 export const SENTENCE_BUILD_PROMPTS = [

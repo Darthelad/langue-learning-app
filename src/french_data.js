@@ -157,86 +157,46 @@ export const GRAMMAR_QUESTIONS = [
     }
 ];
 export const IDIOMS = [
-    {
-        phrase: "Poser un lapin",
-        literal: "To put a rabbit",
-        meaning: "To stand someone up",
-        usage: "Used when someone didn't show up for a date or meeting.",
-        example: "Il ne viendra pas, je crois qu'il m'a posé un lapin.",
-        category: "Social Life"
-    },
-    {
-        phrase: "Avoir le cafard",
-        literal: "To have the cockroach",
-        meaning: "To feel down / depressed / homesick",
-        usage: "To describe feeling a bit sad or melancholic.",
-        example: "J'ai un peu le cafard aujourd'hui avec ce temps.",
-        category: "Emotions"
-    },
-    {
-        phrase: "Revenons à nos moutons",
-        literal: "Let us return to our sheep",
-        meaning: "Let's get back to the topic at hand",
-        usage: "When a conversation has derailed and you want to refocus.",
-        example: "Bref, revenons à nos moutons, qu'en est-il du projet ?",
-        category: "Communication"
-    },
-    {
-        phrase: "Quand les poules auront des dents",
-        literal: "When chickens will have teeth",
-        meaning: "When pigs fly / never",
-        usage: "To express something that is impossible or highly unlikely.",
-        example: "Il sera à l'heure quand les poules auront des dents.",
-        category: "Opportunity"
-    },
-    {
-        phrase: "Couper les cheveux en quatre",
-        literal: "To cut hair in four",
-        meaning: "To split hairs / to overcomplicate things",
-        usage: "When someone is being unnecessarily pedantic or overthinking.",
-        example: "Ne coupe pas les cheveux en quatre, c'est simple !",
-        category: "Personality & Mind"
-    },
-    {
-        phrase: "Avoir la moutarde qui monte au nez",
-        literal: "To have mustard going up the nose",
-        meaning: "To lose one's temper / get angry",
-        usage: "When someone is starting to lose their patience.",
-        example: "Arrête de l'embêter, la moutarde lui monte au nez.",
-        category: "Anger"
-    },
-    {
-        phrase: "Coûter les yeux de la tête",
-        literal: "To cost the eyes of the head",
-        meaning: "To cost an arm and a leg / be extremely expensive",
-        usage: "To complain about a high price.",
-        example: "Cette voiture m'a coûté les yeux de la tête.",
-        category: "Money"
-    },
-    {
-        phrase: "Jeter l'éponge",
-        literal: "To throw the sponge",
-        meaning: "To throw in the towel / give up",
-        usage: "When someone abandons trying to do something difficult.",
-        example: "C'est trop dur, je jette l'éponge.",
-        category: "Work & Business"
-    },
-    {
-        phrase: "Tomber dans les pommes",
-        literal: "To fall in the apples",
-        meaning: "To faint or pass out",
-        usage: "When someone loses consciousness.",
-        example: "Il a vu du sang et il est tombé dans les pommes.",
-        category: "Food & Daily Life"
-    },
-    {
-        phrase: "Appeler un chat un chat",
-        literal: "To call a cat a cat",
-        meaning: "To call a spade a spade / speak plainly",
-        usage: "To speak directly and honestly about something unpleasant.",
-        example: "Il faut appeler un chat un chat, c'est un échec.",
-        category: "Communication"
-    }
+    {"phrase":"Poser un lapin","literal":"To put a rabbit","meaning":"To stand someone up","usage":"Used when someone didn't show up for a date or meeting.","example":"Il ne viendra pas, je crois qu'il m'a posé un lapin.","category":"Social Life"},
+    {"phrase":"Avoir le cafard","literal":"To have the cockroach","meaning":"To feel down / depressed / homesick","usage":"To describe feeling a bit sad or melancholic.","example":"J'ai un peu le cafard aujourd'hui avec ce temps.","category":"Emotions"},
+    {"phrase":"Revenons à nos moutons","literal":"Let us return to our sheep","meaning":"Let's get back to the topic at hand","usage":"When a conversation has derailed and you want to refocus.","example":"Bref, revenons à nos moutons, qu'en est-il du projet ?","category":"Communication"},
+    {"phrase":"Quand les poules auront des dents","literal":"When chickens will have teeth","meaning":"When pigs fly / never","usage":"To express something that is impossible or highly unlikely.","example":"Il sera à l'heure quand les poules auront des dents.","category":"Opportunity"},
+    {"phrase":"Couper les cheveux en quatre","literal":"To cut hair in four","meaning":"To split hairs / to overcomplicate things","usage":"When someone is being unnecessarily pedantic or overthinking.","example":"Ne coupe pas les cheveux en quatre, c'est simple !","category":"Personality & Mind"},
+    {"phrase":"Avoir la moutarde qui monte au nez","literal":"To have mustard going up the nose","meaning":"To lose one's temper / get angry","usage":"When someone is starting to lose their patience.","example":"Arrête de l'embêter, la moutarde lui monte au nez.","category":"Anger"},
+    {"phrase":"Coûter les yeux de la tête","literal":"To cost the eyes of the head","meaning":"To cost an arm and a leg / be extremely expensive","usage":"To complain about a high price.","example":"Cette voiture m'a coûté les yeux de la tête.","category":"Money"},
+    {"phrase":"Jeter l'éponge","literal":"To throw the sponge","meaning":"To throw in the towel / give up","usage":"When someone abandons trying to do something difficult.","example":"C'est trop dur, je jette l'éponge.","category":"Work & Business"},
+    {"phrase":"Tomber dans les pommes","literal":"To fall in the apples","meaning":"To faint or pass out","usage":"When someone loses consciousness.","example":"Il a vu du sang et il est tombé dans les pommes.","category":"Food & Daily Life"},
+    {"phrase":"Appeler un chat un chat","literal":"To call a cat a cat","meaning":"To call a spade a spade / speak plainly","usage":"To speak directly and honestly about something unpleasant.","example":"Il faut appeler un chat un chat, c'est un échec.","category":"Communication"},
+    {"phrase":"Bonjour, comment ça va ?","meaning":"Hello, how are you?","category":"Conversational"},
+    {"phrase":"Je vais très bien, merci.","meaning":"I am doing great, thank you.","category":"Conversational"},
+    {"phrase":"Comment tu t'appelles ?","meaning":"What is your name?","category":"Conversational"},
+    {"phrase":"Je m'appelle...","meaning":"My name is...","category":"Conversational"},
+    {"phrase":"Enchanté.","meaning":"Nice to meet you.","category":"Conversational"},
+    {"phrase":"D'où viens-tu ?","meaning":"Where are you from?","category":"Conversational"},
+    {"phrase":"Je viens de...","meaning":"I am from...","category":"Conversational"},
+    {"phrase":"Parles-tu anglais ?","meaning":"Do you speak English?","category":"Conversational"},
+    {"phrase":"Je parle un petit peu.","meaning":"I speak a little bit.","category":"Conversational"},
+    {"phrase":"Je ne comprends pas.","meaning":"I don't understand.","category":"Conversational"},
+    {"phrase":"Pouvez-vous parler plus lentement, s'il vous plaît ?","meaning":"Can you speak more slowly, please?","category":"Conversational"},
+    {"phrase":"Tu peux répéter ça ?","meaning":"Can you repeat that?","category":"Conversational"},
+    {"phrase":"Excusez-moi, où sont les toilettes ?","meaning":"Excuse me, where is the bathroom?","category":"Conversational"},
+    {"phrase":"Combien ça coûte ?","meaning":"How much does this cost?","category":"Conversational"},
+    {"phrase":"Je voudrais commander.","meaning":"I would like to order.","category":"Conversational"},
+    {"phrase":"L'addition, s'il vous plaît.","meaning":"The check, please.","category":"Conversational"},
+    {"phrase":"Puis-je payer par carte de crédit ?","meaning":"Can I pay with a credit card?","category":"Conversational"},
+    {"phrase":"Quelle heure est-il ?","meaning":"What time is it?","category":"Conversational"},
+    {"phrase":"J'ai besoin d'aide, s'il vous plaît.","meaning":"I need some help, please.","category":"Conversational"},
+    {"phrase":"Je suis perdu.","meaning":"I am lost.","category":"Conversational"},
+    {"phrase":"Passez une bonne journée !","meaning":"Have a great day!","category":"Conversational"},
+    {"phrase":"J'adore apprendre des langues.","meaning":"I love learning languages.","category":"Conversational"},
+    {"phrase":"Que fais-tu ce week-end ?","meaning":"What are you doing this weekend?","category":"Conversational"},
+    {"phrase":"Je me sens un peu fatigué.","meaning":"I am feeling a bit tired.","category":"Conversational"},
+    {"phrase":"As-tu faim ?","meaning":"Are you hungry?","category":"Conversational"},
+    {"phrase":"C'est très délicieux.","meaning":"This is very delicious.","category":"Conversational"},
+    {"phrase":"Je t'appellerai plus tard.","meaning":"I will call you later.","category":"Conversational"},
+    {"phrase":"Quelle est ta nourriture préférée ?","meaning":"What is your favorite food?","category":"Conversational"},
+    {"phrase":"Quel temps fait-il aujourd'hui ?","meaning":"How is the weather today?","category":"Conversational"},
+    {"phrase":"Je suis désolé, je suis en retard.","meaning":"I am sorry, I am late.","category":"Conversational"}
 ];
 export const CONVERSATION_TOPICS = [
     "Tes passe-temps (Your hobbies)",
