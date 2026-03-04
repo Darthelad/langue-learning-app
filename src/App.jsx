@@ -900,38 +900,52 @@ function PlacementTestTab({ data, gainXP }) {
   const [readingChecked, setReadingChecked] = useState(false);
 
   const startTest = async () => {
+    console.log("Starting dictation fetch...");
     setTestState("loading_dictation");
     setScore(0);
     try {
       const prompt = `Write a single random B1-level short conversational sentence in ${data.name} for a dictation test. Output ONLY a valid JSON object with 'native' (the sentence) and 'english' (translation). No markdown ticks.`;
       const response = await callGemini([{ role: "user", content: prompt }], "You are a language teacher. Output ONLY raw JSON.");
+      console.log("Dictation Gemini payload:", response);
       let cleanRes = response.trim();
       if (cleanRes.startsWith("\`\`\`json")) cleanRes = cleanRes.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
       if (cleanRes.startsWith("\`\`\`")) cleanRes = cleanRes.replace(/\`\`\`/g, "");
       const parsed = JSON.parse(cleanRes);
+      console.log("Parsed Dictation JSON:", parsed);
       setListeningTarget(parsed);
     } catch (err) {
       console.error("Failed dictation generation:", err);
       const fallbackList = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
       if (fallbackList.length > 0) {
         const randomIdiom = fallbackList[Math.floor(Math.random() * fallbackList.length)];
+        console.log("Using Dictation fallback:", randomIdiom);
         setListeningTarget({ native: randomIdiom.phrase, english: randomIdiom.meaning });
       } else {
+        console.log("No dictation fallback available either!");
         setListeningTarget({ native: "Error Loading Data", english: "Error" });
       }
     }
+
+    console.log("Setting test state to listening");
     setTestState("listening");
   };
 
   const playAudio = (text) => {
+    console.log("playAudio triggered with text:", text);
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       // Rough language mapping for audio
       const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
       utterance.lang = langMap[data.name] || "en-US";
       utterance.rate = 0.85; // slightly slower for dictation
+
+      utterance.onerror = (e) => console.error("SpeechSynthesis Error:", e);
+      utterance.onstart = () => console.log("SpeechSynthesis Started");
+      utterance.onend = () => console.log("SpeechSynthesis Ended");
+
       window.speechSynthesis.speak(utterance);
     } else {
+      console.error("TTS not supported.");
       alert("TTS not supported in this browser.");
     }
   };
