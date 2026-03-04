@@ -1180,13 +1180,16 @@ function SpeakingTab({ data, gainXP, activeColor }) {
   const [recognition, setRecognition] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Library Support
+  const [viewMode, setViewMode] = useState("practice"); // 'practice' or 'library'
+  const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
+
   const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
 
   useEffect(() => {
     function initSentences() {
       setLoading(true);
       try {
-        const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
         if (sourceIdioms.length > 0) {
           // Shuffle and pick 5 random idioms for practice
           const shuffled = [...sourceIdioms].sort(() => 0.5 - Math.random());
@@ -1338,94 +1341,136 @@ function SpeakingTab({ data, gainXP, activeColor }) {
   return (
     <div className="responsive-card" style={{ padding: "40px 20px" }}>
       <h2 className="responsive-heading" style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 8, textAlign: "center" }}>Pronunciation Trainer</h2>
-      <p style={{ textAlign: "center", color: "#666", marginBottom: 40 }}>Read the sentence aloud to get AI feedback.</p>
 
-      <div className="responsive-card" style={{ background: "#fff", padding: "40px", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 400 }}>
-
-        <div className="speaking-target-row" style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 12 }}>
-          <div className="responsive-title" style={{ fontSize: 28, fontWeight: 800, color: activeColor }}>
-            {item.native}
-          </div>
-          <button
-            onClick={playTargetAudio}
-            style={{
-              background: "#f0f4f8", border: "none", borderRadius: "50%", width: 44, height: 44,
-              fontSize: 22, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "all 0.2s"
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
-            onMouseLeave={e => e.currentTarget.style.background = "#f0f4f8"}
-            title="Listen to pronunciation"
-          >
-            🔊
-          </button>
-        </div>
-        <div style={{ fontSize: 16, color: "#64748b", fontStyle: "italic", marginBottom: 40 }}>
-          "{item.english}"
-        </div>
-
-        {/* Microphone Button */}
-        {!feedback && (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-            <button
-              onClick={toggleRecording}
-              className={isRecording ? "pulse-record" : ""}
-              style={{
-                width: 90, height: 90, borderRadius: "50%",
-                background: isRecording ? "#ef4444" : "#f1f5f9",
-                border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                transition: "all 0.3s",
-                boxShadow: isRecording ? "0 0 0 8px rgba(239, 68, 68, 0.2)" : "0 4px 12px rgba(0,0,0,0.05)"
-              }}
-            >
-              <span style={{ fontSize: 36, color: isRecording ? "#fff" : activeColor }}>🎙️</span>
-            </button>
-            <div style={{ fontSize: 14, fontWeight: 600, color: isRecording ? "#ef4444" : "#64748b" }}>
-              {isRecording ? "Listening... (Click to Stop)" : "Click mic to speak"}
-            </div>
-          </div>
-        )}
-
-        {/* Live Transcript or Final Validation */}
-        <div style={{ marginTop: 30, width: "100%", maxWidth: 500, minHeight: 60 }}>
-          {transcript && !feedback && (
-            <div style={{ padding: 16, background: "#f8fafc", borderRadius: 12, border: "1px dashed #cbd5e1", color: "#334155", fontSize: 18 }}>
-              "{transcript}"
-            </div>
-          )}
-
-          {!isRecording && transcript && !feedback && (
-            <button onClick={evaluateSpeech} style={{ ...btnStyle(activeColor, "#fff"), marginTop: 20, padding: "12px 30px" }}>
-              Evaluate My Pronunciation
-            </button>
-          )}
-
-          {feedback && (
-            <div style={{ animation: "fadeIn 0.4s ease" }}>
-              <div style={{ fontSize: 48, fontWeight: 800, color: feedback.score >= 70 ? "#22c55e" : "#eab308", marginBottom: 10 }}>
-                {feedback.score}%
-              </div>
-              <div style={{ fontSize: 16, color: "#64748b", marginBottom: 20 }}>Accuracy</div>
-
-              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 30 }}>
-                {feedback.words.map((wf, idx) => (
-                  <span key={idx} style={{
-                    padding: "4px 10px", borderRadius: 8, fontSize: 18, fontWeight: 600,
-                    background: wf.correct ? "#dcfce7" : "#fee2e2",
-                    color: wf.correct ? "#166534" : "#991b1b"
-                  }}>
-                    {wf.text}
-                  </span>
-                ))}
-              </div>
-
-              <button onClick={nextSentence} style={{ ...btnStyle("#333", "#fff"), padding: "14px 40px" }}>
-                Next Sentence →
-              </button>
-            </div>
-          )}
-        </div>
+      {/* View Toggle */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 30 }}>
+        <button
+          onClick={() => setViewMode("practice")}
+          style={{ padding: "8px 16px", borderRadius: 20, border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", background: viewMode === "practice" ? activeColor : "#e2e8f0", color: viewMode === "practice" ? "#fff" : "#64748b", transition: "all 0.2s" }}
+        >
+          Random Practice
+        </button>
+        <button
+          onClick={() => setViewMode("library")}
+          style={{ padding: "8px 16px", borderRadius: 20, border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer", background: viewMode === "library" ? activeColor : "#e2e8f0", color: viewMode === "library" ? "#fff" : "#64748b", transition: "all 0.2s" }}
+        >
+          Phrase Library
+        </button>
       </div>
+
+      {viewMode === "library" ? (
+        <div style={{ background: "#f8fafc", padding: 20, borderRadius: 16, border: "1px solid #e2e8f0", maxHeight: 500, overflowY: "auto" }}>
+          <h3 style={{ fontSize: 18, color: "#333", marginBottom: 15 }}>Select a Phrase to Practice</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {sourceIdioms.map((idiom, idx) => (
+              <div
+                key={idx}
+                onClick={() => {
+                  setItems([{ native: idiom.phrase, english: idiom.meaning }]);
+                  setCurrentIndex(0);
+                  setTranscript("");
+                  setFeedback(null);
+                  setViewMode("practice");
+                }}
+                style={{ padding: 16, background: "#fff", borderRadius: 12, border: "1px solid #cbd5e1", cursor: "pointer", transition: "all 0.2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = activeColor}
+                onMouseLeave={e => e.currentTarget.style.borderColor = "#cbd5e1"}
+              >
+                <div style={{ fontSize: 18, fontWeight: 700, color: "#1e293b", marginBottom: 4 }}>{idiom.phrase}</div>
+                <div style={{ fontSize: 14, color: "#64748b" }}>{idiom.meaning}</div>
+              </div>
+            ))}
+            {sourceIdioms.length === 0 && <div style={{ color: "#888", textAlign: "center", padding: 20 }}>No phrases available in library.</div>}
+          </div>
+        </div>
+      ) : (
+        <div className="responsive-card" style={{ background: "#fff", padding: "40px", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 400 }}>
+
+          <div className="speaking-target-row" style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 12 }}>
+            <div className="responsive-title" style={{ fontSize: 28, fontWeight: 800, color: activeColor }}>
+              {item.native}
+            </div>
+            <button
+              onClick={playTargetAudio}
+              style={{
+                background: "#f0f4f8", border: "none", borderRadius: "50%", width: 44, height: 44,
+                fontSize: 22, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                transition: "all 0.2s"
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
+              onMouseLeave={e => e.currentTarget.style.background = "#f0f4f8"}
+              title="Listen to pronunciation"
+            >
+              🔊
+            </button>
+          </div>
+          <div style={{ fontSize: 16, color: "#64748b", fontStyle: "italic", marginBottom: 40 }}>
+            "{item.english}"
+          </div>
+
+          {/* Microphone Button */}
+          {!feedback && (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
+              <button
+                onClick={toggleRecording}
+                className={isRecording ? "pulse-record" : ""}
+                style={{
+                  width: 90, height: 90, borderRadius: "50%",
+                  background: isRecording ? "#ef4444" : "#f1f5f9",
+                  border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.3s",
+                  boxShadow: isRecording ? "0 0 0 8px rgba(239, 68, 68, 0.2)" : "0 4px 12px rgba(0,0,0,0.05)"
+                }}
+              >
+                <span style={{ fontSize: 36, color: isRecording ? "#fff" : activeColor }}>🎙️</span>
+              </button>
+              <div style={{ fontSize: 14, fontWeight: 600, color: isRecording ? "#ef4444" : "#64748b" }}>
+                {isRecording ? "Listening... (Click to Stop)" : "Click mic to speak"}
+              </div>
+            </div>
+          )}
+
+          {/* Live Transcript or Final Validation */}
+          <div style={{ marginTop: 30, width: "100%", maxWidth: 500, minHeight: 60 }}>
+            {transcript && !feedback && (
+              <div style={{ padding: 16, background: "#f8fafc", borderRadius: 12, border: "1px dashed #cbd5e1", color: "#334155", fontSize: 18 }}>
+                "{transcript}"
+              </div>
+            )}
+
+            {!isRecording && transcript && !feedback && (
+              <button onClick={evaluateSpeech} style={{ ...btnStyle(activeColor, "#fff"), marginTop: 20, padding: "12px 30px" }}>
+                Evaluate My Pronunciation
+              </button>
+            )}
+
+            {feedback && (
+              <div style={{ animation: "fadeIn 0.4s ease" }}>
+                <div style={{ fontSize: 48, fontWeight: 800, color: feedback.score >= 70 ? "#22c55e" : "#eab308", marginBottom: 10 }}>
+                  {feedback.score}%
+                </div>
+                <div style={{ fontSize: 16, color: "#64748b", marginBottom: 20 }}>Accuracy</div>
+
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, marginBottom: 30 }}>
+                  {feedback.words.map((wf, idx) => (
+                    <span key={idx} style={{
+                      padding: "4px 10px", borderRadius: 8, fontSize: 18, fontWeight: 600,
+                      background: wf.correct ? "#dcfce7" : "#fee2e2",
+                      color: wf.correct ? "#166534" : "#991b1b"
+                    }}>
+                      {wf.text}
+                    </span>
+                  ))}
+                </div>
+
+                <button onClick={nextSentence} style={{ ...btnStyle("#333", "#fff"), padding: "14px 40px" }}>
+                  Next Sentence →
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <style>
         {`
