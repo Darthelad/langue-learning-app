@@ -1024,9 +1024,9 @@ function PlacementTestTab({ data, gainXP }) {
 
   if (testState === "start") {
     return (
-      <div style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+      <div className="responsive-card" style={{ padding: "40px 20px", textAlign: "center", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
         <div style={{ fontSize: "5rem", marginBottom: 20 }}>🎓</div>
-        <h2 style={{ fontSize: 32, fontWeight: 800, color: "#333", marginBottom: 20 }}>Placement Evaluation</h2>
+        <h2 className="responsive-heading" style={{ fontSize: 32, fontWeight: 800, color: "#333", marginBottom: 20 }}>Placement Evaluation</h2>
         <p style={{ fontSize: 18, color: "#666", maxWidth: 600, margin: "0 auto 30px", lineHeight: 1.6 }}>
           Take a standardized dual-module exam to evaluate your proficiency in <strong>{data.name}</strong>.
           Your performance will determine your initial CEFR Rank and award a lump-sum XP bonus.
@@ -1047,8 +1047,8 @@ function PlacementTestTab({ data, gainXP }) {
 
   if (testState === "listening") {
     return (
-      <div style={{ padding: "40px 20px", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
-        <h3 style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 10, textAlign: "center" }}>Module 1: Listening Dictation</h3>
+      <div className="responsive-card" style={{ padding: "40px 20px", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+        <h3 className="responsive-heading" style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 10, textAlign: "center" }}>Module 1: Listening Dictation</h3>
         <p style={{ textAlign: "center", color: "#666", marginBottom: 30 }}>Click the speaker to hear a phrase in {data.name}. Type exactly what you hear.</p>
 
         {listeningTarget ? (
@@ -1098,8 +1098,8 @@ function PlacementTestTab({ data, gainXP }) {
 
   if (testState === "reading") {
     return (
-      <div style={{ padding: "40px 20px", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", maxWidth: 700, margin: "0 auto" }}>
-        <h3 style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 10, textAlign: "center" }}>Module 2: Reading Comprehension</h3>
+      <div className="responsive-card" style={{ padding: "40px 20px", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", maxWidth: 700, margin: "0 auto" }}>
+        <h3 className="responsive-heading" style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 10, textAlign: "center" }}>Module 2: Reading Comprehension</h3>
 
         {readingLoading || !readingData ? (
           <div style={{ textAlign: "center", padding: 40, color: "#888", fontSize: 18 }}>
@@ -1149,9 +1149,9 @@ function PlacementTestTab({ data, gainXP }) {
 
   if (testState === "results") {
     return (
-      <div style={{ padding: "50px 20px", textAlign: "center", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+      <div className="responsive-card" style={{ padding: "50px 20px", textAlign: "center", background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
         <div style={{ fontSize: "5rem", marginBottom: 20 }}>{score >= 50 ? "🎉" : "📚"}</div>
-        <h2 style={{ fontSize: 36, fontWeight: 800, color: "#333", marginBottom: 10 }}>Exam Complete</h2>
+        <h2 className="responsive-heading" style={{ fontSize: 36, fontWeight: 800, color: "#333", marginBottom: 10 }}>Exam Complete</h2>
         <p style={{ fontSize: 20, color: "#666", marginBottom: 30 }}>Final Score: <strong>{score}/100</strong></p>
 
         <div style={{ background: "#f8fafc", padding: 24, borderRadius: 16, display: "inline-block", textAlign: "left", marginBottom: 30 }}>
@@ -1339,14 +1339,14 @@ function SpeakingTab({ data, gainXP, activeColor }) {
   }
 
   return (
-    <div style={{ padding: "40px 20px" }}>
-      <h2 style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 8, textAlign: "center" }}>Pronunciation Trainer</h2>
+    <div className="responsive-card" style={{ padding: "40px 20px" }}>
+      <h2 className="responsive-heading" style={{ fontSize: 24, fontWeight: 700, color: "#333", marginBottom: 8, textAlign: "center" }}>Pronunciation Trainer</h2>
       <p style={{ textAlign: "center", color: "#666", marginBottom: 40 }}>Read the sentence aloud to get AI feedback.</p>
 
-      <div style={{ background: "#fff", padding: "40px", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 400 }}>
+      <div className="responsive-card" style={{ background: "#fff", padding: "40px", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 400 }}>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 12 }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: activeColor }}>
+        <div className="speaking-target-row" style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 12 }}>
+          <div className="responsive-title" style={{ fontSize: 28, fontWeight: 800, color: activeColor }}>
             {item.native}
           </div>
           <button
