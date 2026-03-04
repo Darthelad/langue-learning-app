@@ -1220,7 +1220,7 @@ function SpeakingTab({ data, name, gainXP, activeColor }) {
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           currentTranscript += event.results[i][0].transcript;
         }
-        console.log("Speech API Transcript:", currentTranscript);
+        console.log("🗣️ Speech API Transcript:", currentTranscript);
         setTranscript(currentTranscript);
       };
 
@@ -1273,6 +1273,12 @@ function SpeakingTab({ data, name, gainXP, activeColor }) {
     const targetWords = cleanStr(target).split(/\s+/);
     const spokenWords = cleanStr(transcript).split(/\s+/);
 
+    console.log("🧪 EVALUATING SPEECH:");
+    console.log("Target Raw:", target);
+    console.log("Spoken Raw:", transcript);
+    console.log("Target Words:", targetWords);
+    console.log("Spoken Words:", spokenWords);
+
     let correctCount = 0;
     const wordFeedback = targetWords.map(targetWord => {
       // Very simple greedy match (exact or very close substitution could be added, doing exact for now)
@@ -1282,6 +1288,7 @@ function SpeakingTab({ data, name, gainXP, activeColor }) {
     });
 
     const score = targetWords.length > 0 ? (correctCount / targetWords.length) * 100 : 0;
+    console.log("Score Calculated:", score, "Feedback:", wordFeedback);
 
     setFeedback({
       score: Math.round(score),
