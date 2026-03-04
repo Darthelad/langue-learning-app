@@ -900,30 +900,26 @@ function PlacementTestTab({ data, gainXP }) {
   const [readingChecked, setReadingChecked] = useState(false);
 
   const startTest = async () => {
-    console.log("Starting dictation fetch...");
+    console.log("Starting dictation fetch from static data...");
     setTestState("loading_dictation");
     setScore(0);
+
+    // Simulate slight loading delay for UI consistency
+    await new Promise(r => setTimeout(r, 500));
+
     try {
-      const prompt = `Write a single random B1-level short conversational sentence for a dictation test. The target language is ${data.name}. Output ONLY a valid JSON object with 'native' (the sentence written STRICTLY in the native alphabet/script of ${data.name}, e.g. Hebrew letters for Hebrew, Cyrillic for Russian, Hangul for Korean) and 'english' (the English translation). Do not use transliterations or English letters for the native field. No markdown ticks.`;
-      const response = await callGemini([{ role: "user", content: prompt }], "You are a language teacher. Output ONLY raw JSON. You MUST use the native alphabet for the target language.");
-      console.log("Dictation Gemini payload:", response);
-      let cleanRes = response.trim();
-      if (cleanRes.startsWith("\`\`\`json")) cleanRes = cleanRes.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
-      if (cleanRes.startsWith("\`\`\`")) cleanRes = cleanRes.replace(/\`\`\`/g, "");
-      const parsed = JSON.parse(cleanRes);
-      console.log("Parsed Dictation JSON:", parsed);
-      setListeningTarget(parsed);
-    } catch (err) {
-      console.error("Failed dictation generation:", err);
-      const fallbackList = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
-      if (fallbackList.length > 0) {
-        const randomIdiom = fallbackList[Math.floor(Math.random() * fallbackList.length)];
-        console.log("Using Dictation fallback:", randomIdiom);
+      const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
+      if (sourceIdioms.length > 0) {
+        const randomIdiom = sourceIdioms[Math.floor(Math.random() * sourceIdioms.length)];
+        console.log("Using Dictation target:", randomIdiom);
         setListeningTarget({ native: randomIdiom.phrase, english: randomIdiom.meaning });
       } else {
-        console.log("No dictation fallback available either!");
+        console.log("No dictation data available!");
         setListeningTarget({ native: "Error Loading Data", english: "Error" });
       }
+    } catch (err) {
+      console.error("Failed dictation generation:", err);
+      setListeningTarget({ native: "Error Loading Data", english: "Error" });
     }
 
     console.log("Setting test state to listening");
@@ -1187,23 +1183,21 @@ function SpeakingTab({ data, gainXP, activeColor }) {
   const langMap = { "Italian": "it-IT", "Korean": "ko-KR", "Hebrew": "he-IL", "Spanish": "es-ES", "English": "en-US", "Russian": "ru-RU", "Portuguese": "pt-PT", "French": "fr-FR" };
 
   useEffect(() => {
-    async function initSentences() {
+    function initSentences() {
       setLoading(true);
       try {
-        const prompt = `Generate 5 random, unique B1-level conversational sentences for a language learner to practice speaking. The target language is ${data.name}. Output ONLY a valid JSON array of objects with 'native' (the sentence written STRICTLY in the native alphabet/script of ${data.name}, e.g. Hebrew letters for Hebrew, Cyrillic for Russian, Hangul for Korean) and 'english' (the English translation). Do not use transliteration or Romanized characters for the 'native' field. No markdown ticks.`;
-        const res = await callGemini([{ role: "user", content: prompt }], "You are a helpful language generator. Output raw JSON ONLY. You MUST use the native alphabet for the target language.");
-        let clean = res.trim();
-        if (clean.startsWith("\`\`\`json")) clean = clean.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
-        if (clean.startsWith("\`\`\`")) clean = clean.replace(/\`\`\`/g, "");
-        const parsed = JSON.parse(clean);
-        // Ensure parsing returned an array. If it returned { sentences: [...] }, handle it.
-        const parsedArray = Array.isArray(parsed) ? parsed : (parsed.sentences || parsed.items || [parsed]);
-        setItems(parsedArray);
-      } catch (e) {
-        console.error("Gemini failed, using fallback Idioms", e);
         const sourceIdioms = data.data && data.data.IDIOMS ? data.data.IDIOMS : [];
-        const fallback = sourceIdioms.map(i => ({ native: i.phrase, english: i.meaning }));
-        setItems(fallback);
+        if (sourceIdioms.length > 0) {
+          // Shuffle and pick 5 random idioms for practice
+          const shuffled = [...sourceIdioms].sort(() => 0.5 - Math.random());
+          const selected = shuffled.slice(0, 5).map(i => ({ native: i.phrase, english: i.meaning }));
+          setItems(selected);
+        } else {
+          setItems([{ native: "No data available", english: "Please add Idioms to this language module." }]);
+        }
+      } catch (e) {
+        console.error("Failed to load static speaking data:", e);
+        setItems([]);
       }
       setLoading(false);
     }
