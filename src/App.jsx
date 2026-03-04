@@ -904,8 +904,8 @@ function PlacementTestTab({ data, gainXP }) {
     setTestState("loading_dictation");
     setScore(0);
     try {
-      const prompt = `Write a single random B1-level short conversational sentence in ${data.name} for a dictation test. Output ONLY a valid JSON object with 'native' (the sentence) and 'english' (translation). No markdown ticks.`;
-      const response = await callGemini([{ role: "user", content: prompt }], "You are a language teacher. Output ONLY raw JSON.");
+      const prompt = `Write a single random B1-level short conversational sentence for a dictation test. The target language is ${data.name}. Output ONLY a valid JSON object with 'native' (the sentence written STRICTLY in the native alphabet/script of ${data.name}, e.g. Hebrew letters for Hebrew, Cyrillic for Russian, Hangul for Korean) and 'english' (the English translation). Do not use transliterations or English letters for the native field. No markdown ticks.`;
+      const response = await callGemini([{ role: "user", content: prompt }], "You are a language teacher. Output ONLY raw JSON. You MUST use the native alphabet for the target language.");
       console.log("Dictation Gemini payload:", response);
       let cleanRes = response.trim();
       if (cleanRes.startsWith("\`\`\`json")) cleanRes = cleanRes.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
@@ -1190,8 +1190,8 @@ function SpeakingTab({ data, gainXP, activeColor }) {
     async function initSentences() {
       setLoading(true);
       try {
-        const prompt = `Generate 5 random, unique B1-level conversational sentences in ${data.name} for a language learner to practice speaking. Output ONLY a valid JSON array of objects with 'native' (the sentence) and 'english' (the English translation). No markdown ticks.`;
-        const res = await callGemini([{ role: "user", content: prompt }], "You are a helpful language generator. Output raw JSON ONLY.");
+        const prompt = `Generate 5 random, unique B1-level conversational sentences for a language learner to practice speaking. The target language is ${data.name}. Output ONLY a valid JSON array of objects with 'native' (the sentence written STRICTLY in the native alphabet/script of ${data.name}, e.g. Hebrew letters for Hebrew, Cyrillic for Russian, Hangul for Korean) and 'english' (the English translation). Do not use transliteration or Romanized characters for the 'native' field. No markdown ticks.`;
+        const res = await callGemini([{ role: "user", content: prompt }], "You are a helpful language generator. Output raw JSON ONLY. You MUST use the native alphabet for the target language.");
         let clean = res.trim();
         if (clean.startsWith("\`\`\`json")) clean = clean.replace(/\`\`\`json/g, "").replace(/\`\`\`/g, "");
         if (clean.startsWith("\`\`\`")) clean = clean.replace(/\`\`\`/g, "");
