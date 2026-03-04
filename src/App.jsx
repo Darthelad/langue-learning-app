@@ -1292,6 +1292,20 @@ function SpeakingTab({ data, gainXP, activeColor }) {
     setCurrentIndex(prev => (prev + 1) % items.length);
   };
 
+  const playTargetAudio = () => {
+    if ('speechSynthesis' in window) {
+      const targetText = items[currentIndex]?.native;
+      if (!targetText) return;
+
+      const utterance = new SpeechSynthesisUtterance(targetText);
+      utterance.lang = langMap[data.name] || "en-US";
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Text-to-Speech is not supported in this browser.");
+    }
+  };
+
   const item = items[currentIndex];
 
   if (loading) {
@@ -1314,8 +1328,23 @@ function SpeakingTab({ data, gainXP, activeColor }) {
 
       <div style={{ background: "#fff", padding: "40px", borderRadius: 24, boxShadow: "0 4px 20px rgba(0,0,0,0.05)", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 400 }}>
 
-        <div style={{ fontSize: 28, fontWeight: 800, color: activeColor, marginBottom: 12 }}>
-          {item.native}
+        <div style={{ display: "flex", alignItems: "center", gap: 15, marginBottom: 12 }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: activeColor }}>
+            {item.native}
+          </div>
+          <button
+            onClick={playTargetAudio}
+            style={{
+              background: "#f0f4f8", border: "none", borderRadius: "50%", width: 44, height: 44,
+              fontSize: 22, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "#e2e8f0"}
+            onMouseLeave={e => e.currentTarget.style.background = "#f0f4f8"}
+            title="Listen to pronunciation"
+          >
+            🔊
+          </button>
         </div>
         <div style={{ fontSize: 16, color: "#64748b", fontStyle: "italic", marginBottom: 40 }}>
           "{item.english}"
